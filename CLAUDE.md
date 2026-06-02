@@ -15,17 +15,25 @@ docs/
 │   ├── design_roles.md          # 13 skills across 7 agents, dependency chains, orchestration patterns
 │   └── _ai_arts_roles.md        # AI art generation tools guide (Midjourney, ComfyUI, Meshy, etc.)
 └── workflow/
-    ├── iteration_loop.md        # THE MAIN ENTRY POINT — 8-phase iteration loop
-    ├── orchestrator.md          # How the loop adapts across 9 project lifecycle phases
-    └── tasks/
-        ├── 01_orient.md         # Phase 1: Read state, rebuild context
-        ├── 02_triage.md         # Phase 2: Health check, fix regressions
-        ├── 03_select.md         # Phase 3: Pick one work item, verify dependencies
-        ├── 04_design.md         # Phase 4: Design agents produce specifications
-        ├── 05_implement.md      # Phase 5: Programming, art, audio build from specs
-        ├── 06_test.md           # Phase 6: QA testing, compliance, playtesting
-        ├── 07_verify.md         # Phase 7: Cross-role review, design intent check
-        └── 08_commit.md         # Phase 8: Update state files, git commit, clean state
+    ├── iteration_loop.md        # THE MAIN ENTRY POINT — 8-phase loop (§11 evaluator, §12 fast-path)
+    ├── orchestrator.md          # How the loop adapts across 9 lifecycle phases (+ vertical-slice gate)
+    ├── tasks/
+    │   ├── 01_orient.md         # Phase 1: Read state, rebuild context
+    │   ├── 02_triage.md         # Phase 2: Health check, fix regressions
+    │   ├── 03_select.md         # Phase 3: Pick one work item, verify deps, choose full/fast-path
+    │   ├── 04_design.md         # Phase 4: Design agents produce specs + sprint contract
+    │   ├── 05_implement.md      # Phase 5: Programming, art, audio build from specs + contract
+    │   ├── 06_test.md           # Phase 6: QA testing, compliance, playtesting
+    │   ├── 07_verify.md         # Phase 7: INDEPENDENT EVALUATOR judges design intent
+    │   └── 08_commit.md         # Phase 8: Update state, run feature-list guard, commit, clean state
+    └── n8n/                     # Importable n8n workflows (orchestrator + 8 phase sub-workflows)
+
+agents/                          # Claude Agent SDK server that n8n calls over HTTP
+└── game_agents/
+    ├── agents.py                # 7 design agents + 16 impl/QA roles + the independent EVALUATOR
+    ├── phases.py                # Per-phase runner (routes Verify through the evaluator)
+    ├── schemas.py               # Structured-output schema per phase (verdicts n8n branches on)
+    └── feature_list.py          # Mechanical guard for the sacred feature_list.json
 ```
 
 ## How To Work On This Project
@@ -46,14 +54,22 @@ If these state files don't exist yet, the project needs Cycle 0 initialization �
 Every iteration follows: **Orient → Triage → Select → Design → Implement → Test → Verify → Commit**
 
 - In early phases (Concept, Pre-Production), skip Implement and Test — design documents are the deliverable
+- **Design (Phase 4) produces a sprint contract** — testable "done" criteria the evaluator approves *before* Implement, so the maker and judge share one definition of done
+- **Verify (Phase 7) is run by the independent evaluator** — a separate, read-only, skeptical agent that did NOT design or build the work (never the spec's authors). It judges against acceptance criteria + the contract + the quality gate, exercising a live build via Playwright where one exists. See `iteration_loop.md` §11
+- **Trivial/cosmetic items take the lightweight fast-path** (§12) — skip the full agent fan-out, but keep Triage, the evaluator's regression check, the feature-list guard, and the clean-state commit
+- **Run one continuous session per iteration** (automatic compaction handles context growth); do NOT hard-reset between phases by default — see `iteration_loop.md` §1
 - Detailed procedures for each phase live in `docs/workflow/tasks/01_orient.md` through `08_commit.md`
 - The full loop definition is in `docs/workflow/iteration_loop.md`
+
+### Lifecycle note: vertical slice
+
+Between Prototype and Production there is a **vertical-slice gate**: one 3-5 min chunk built to *ship quality* across every discipline (design, code, art, audio, UI, QA), distinct from the ugly prototype. It proves the game is shippable and the pipeline works before scaling the full budget. See `orchestrator.md` §4b.
 
 ### Where We Are in the Lifecycle
 
 The project lifecycle has 9 phases: Concept → Pre-Production → Prototype → Production → Alpha → Beta → Polish → Launch → Post-Launch. See `docs/workflow/orchestrator.md` for what each phase looks like.
 
-**Current status:** Pre-Cycle 0. The workflow architecture is built but the initialization iteration (creating feature_list.json, progress.md, backlog.md, project identity) has not yet run.
+**Current status:** Pre-Cycle 0. The workflow architecture, the Claude Agent SDK server (`agents/`), and the n8n orchestration workflows are built, but the initialization iteration (creating feature_list.json, progress.md, backlog.md, project identity) has not yet run.
 
 ## Key Concepts
 
@@ -85,9 +101,14 @@ These cover the actual building of the game (not design decisions):
 
 | File | Purpose | Rules |
 |------|---------|-------|
-| `docs/workflow/feature_list.json` | Sacred feature registry | Append-only. Never delete features. `passes` goes `false` → `true` only after verification. |
-| `docs/workflow/progress.md` | Iteration history | Append-only. One entry per iteration. First thing to read. |
+| `docs/workflow/feature_list.json` | Sacred feature registry | Append-only. Never delete features or edit descriptions. `passes` goes `false` → `true` only after the evaluator passes it; `true` → `false` only with a `note` declaring the regression. **Enforced mechanically** by `agents/game_agents/feature_list.py` (+ tests). |
+| `docs/workflow/progress.md` | Iteration history | Append-only. One entry per iteration (tag `(FAST-PATH)` for fast-path runs). First thing to read. |
 | `docs/workflow/backlog.md` | Prioritized work queue | Agent 7 owns priority. Updated at end of each iteration. |
+
+**Validate the feature list any time:**
+```bash
+cd agents && uv run python -m game_agents.feature_list ../docs/workflow/feature_list.json
+```
 
 ### Skill Dependencies
 
@@ -141,12 +162,13 @@ All diagrams in documentation use **Mermaid** syntax (```mermaid blocks). No ASC
 ## Important Rules
 
 1. **One work item per iteration.** Never batch. Incremental progress beats ambitious sprints.
-2. **No implementation without a design spec.** Every artifact traces to a spec from Phase 4 (Design).
-3. **Feature list is sacred.** Features are never deleted or silently modified. Only `passes` status changes.
+2. **No implementation without a design spec.** Every artifact traces to a spec from Phase 4 (Design), with an evaluator-approved sprint contract.
+3. **Feature list is sacred.** Features are never deleted or reworded; only `passes` status changes (with a `note` on any regression). This is enforced by the guard in `feature_list.py`, not just by convention.
 4. **Clean state in, clean state out.** Every iteration reads state at start, writes state at end.
-5. **Verify before marking done.** Nothing moves to `passes: true` without passing its quality gate.
+5. **The maker is not the judge.** The agent that designs/builds a deliverable never decides whether it passes — Phase 7 is the independent, read-only evaluator. Nothing moves to `passes: true` without its sign-off.
 6. **Design before implementation.** Foundation skills (1.1-1.4) must pass before content or polish work begins.
 7. **Benchmark alignment.** Every 5th iteration (or at phase gates), check decisions against `docs/benchmarks/main.md`.
+8. **Scale the loop to the work.** Trivial/cosmetic items take the fast-path (§12); full features take the full loop. The full harness is ~20× the cost of a solo pass — reserve it for work that benefits from it.
 
 ## Benchmark Context
 
