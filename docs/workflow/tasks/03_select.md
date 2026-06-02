@@ -62,6 +62,27 @@ Implementation Dependencies:
 Status: READY / BLOCKED (by: ___)
 ```
 
+### Step 2b: Choose the path — full loop or fast-path
+
+Before activating roles, decide whether this item needs the full ceremony or qualifies for the **lightweight fast-path** (`iteration_loop.md` §12). The full loop (7 design agents + 16 impl roles + evaluator + per-phase approval) is worth its cost on real features but is ~20× overkill on a trivial change.
+
+```
+PATH DECISION
+─────────────
+Fast-path ONLY if ALL are true:
+  [ ] Cosmetic/trivial (copy tweak, value tune, one-line config, typo, doc fix)
+  [ ] Touches no passes:true feature's BEHAVIOR and crosses no system boundary
+  [ ] Needs no new design decision (implements something already specified)
+  [ ] Reversible and small enough to eyeball
+Otherwise → FULL LOOP.  When unsure → FULL LOOP.
+
+Chosen path: FULL LOOP / FAST-PATH
+```
+
+On **FAST-PATH**: skip Step 3's full role fan-out — name the single role that makes the change. Design (Phase 4) and the impl fan-out are skipped, but Triage, the independent evaluator's regression check, the feature-list guard, and the clean-state commit are **not**. Tag the progress entry `(FAST-PATH)`.
+
+On **FULL LOOP**: continue to Step 3.
+
 ### Step 3: Identify required roles
 
 From the activation matrix, determine:
@@ -128,7 +149,8 @@ If the top-priority item is blocked:
 
 - [ ] Exactly one work item selected
 - [ ] All dependencies verified as passing
-- [ ] Required roles identified (design + implementation + QA)
+- [ ] Path chosen (full loop vs fast-path) against the §12 criteria
+- [ ] Required roles identified (design + implementation + QA), scaled to the path
 - [ ] Scope statement written
 - [ ] Item is realistically completable in one iteration
 

@@ -49,7 +49,7 @@
       "parameters": {
         "resume": "form",
         "formTitle": "Approve Phase: DESIGN",
-        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 DESIGN summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nFeatures: {{ $json.structured_output ? ($json.structured_output.feature_ids || []).join(', ') : '' }} | Design is deliverable: {{ $json.structured_output ? $json.structured_output.design_is_deliverable : '?' }} | Consistent: {{ $json.structured_output ? $json.structured_output.cross_review_consistent : '?' }}",
+        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 DESIGN summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nFeatures: {{ $json.structured_output ? ($json.structured_output.feature_ids || []).join(', ') : '' }} | Design is deliverable: {{ $json.structured_output ? $json.structured_output.design_is_deliverable : '?' }} | Consistent: {{ $json.structured_output ? $json.structured_output.cross_review_consistent : '?' }} | Contract items: {{ $json.structured_output ? ($json.structured_output.sprint_contract || []).length : '?' }} | Contract approved: {{ $json.structured_output ? $json.structured_output.contract_approved_by_evaluator : '?' }}",
         "formFields": {
           "values": [
             {

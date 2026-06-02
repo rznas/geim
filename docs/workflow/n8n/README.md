@@ -112,9 +112,11 @@ phase (see `agents/game_agents/schemas.py`). The orchestrator branches on:
 | Phase | Field used for routing |
 |---|---|
 | triage | `structured_output.verdict` (CLEAN/MINOR/MAJOR/CRITICAL) |
-| design | `structured_output.design_is_deliverable` (bool) |
+| design | `structured_output.design_is_deliverable` (bool); also carries the evaluator-approved `sprint_contract` |
 | test | `structured_output.verdict` (ALL_PASS/MINOR_BUGS/MAJOR_BUGS/CRITICAL_BUGS) |
-| verify | `structured_output.route` (COMMIT/BACK_TO_DESIGN/BACK_TO_IMPLEMENT) |
+| verify | `structured_output.route` (COMMIT/BACK_TO_DESIGN/BACK_TO_IMPLEMENT) — produced by the **independent evaluator**, with `criteria_checked` / `findings` / `exercised_build` for the approval form |
+
+> **Phase 7 (Verify) is driven by a separate, read-only evaluator agent**, not Agent 7 (the agent SDK routes it via `phases.py`). The human-approval Form still gates progression as before; the evaluator just makes the agent verdict a real judgment rather than self-review. See `../iteration_loop.md` §11.
 
 Plus every phase returns `approved` (from the Form) which gates progression.
 

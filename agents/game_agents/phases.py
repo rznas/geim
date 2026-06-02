@@ -17,13 +17,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from claude_agent_sdk import (
+    AgentDefinition,
     AssistantMessage,
     ClaudeSDKClient,
     ResultMessage,
     TextBlock,
 )
 
-from .agents import AGENT_7, DESIGN_AGENTS
+from .agents import AGENT_7, DESIGN_AGENTS, EVALUATOR
 from .config import REPO_ROOT, make_options
 from .schemas import PHASE_SCHEMAS
 
@@ -57,15 +58,29 @@ class PhaseRun:
     session_id: str
 
 
+def _phase_driver(phase: str) -> AgentDefinition:
+    """The agent whose system prompt drives a given phase.
+
+    Agent 7 drives every orchestration phase EXCEPT Verify. Verify is run by the
+    independent EVALUATOR — a separate, read-only, skeptical judge that did not
+    design or build the work. Keeping the judge distinct from the maker is the
+    core reliability lever from Anthropic's harness design; routing Verify through
+    Agent 7 (who coordinated the build) would reintroduce the self-evaluation
+    bias the split exists to remove.
+    """
+    return EVALUATOR if phase == "verify" else AGENT_7
+
+
 def _phase_system_prompt(phase: str) -> str:
     """The driver agent's system prompt for a given phase.
 
     Agent 7 (Production & Business Lead) drives the orchestration phases — it owns
     the feature list, backlog, gates, commits, and playtesting. The design phase
     additionally exposes the 7 design agents as subagents the driver delegates to,
-    each invoking only its own distinct skills.
+    each invoking only its own distinct skills. Verify is driven by the
+    independent EVALUATOR instead (see `_phase_driver`).
     """
-    base = AGENT_7.prompt
+    base = _phase_driver(phase).prompt
     doc = PHASE_DOCS[phase]
     if phase == "design":
         roster = "\n".join(
@@ -134,14 +149,20 @@ async def run_phase(
 
     schema = PHASE_SCHEMAS[phase].model_json_schema()
 
-    # Design phase exposes the design agents as subagents; other phases run as
-    # Agent 7 alone (it still uses Bash/Read/Write/Edit to do the work).
+    # Design phase exposes the design agents as subagents; Verify runs as the
+    # independent evaluator alone (read-only, never delegating to makers); every
+    # other phase runs as Agent 7 alone (it uses Bash/Read/Write/Edit to do work).
     agents = subagents if subagents is not None else (
         DESIGN_AGENTS if phase == "design" else None
     )
 
-    # Agent 7 needs the Task tool to delegate to design subagents in the design phase.
-    allowed = list(AGENT_7.tools or [])
+    # Tools come from the phase's driver: Verify gets the evaluator's read-only +
+    # Playwright set (no Write/Edit/Bash), so the judge cannot mutate what it
+    # grades; all other phases get Agent 7's coordinating tool set.
+    driver = _phase_driver(phase)
+    allowed = list(driver.tools or [])
+    # Agent 7 needs the Task tool to delegate to design subagents in the design
+    # phase. The evaluator never delegates, so it is never granted Task.
     if agents and "Task" not in allowed:
         allowed.append("Task")
 

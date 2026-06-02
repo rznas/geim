@@ -38,6 +38,28 @@ QA_TOOLS = [*READ_TOOLS, "Write", "Edit", "TodoWrite", "Bash"]
 # (git/commit/triage), so it gets the Skill tool plus Bash.
 PRODUCTION_TOOLS = ["Skill", *READ_TOOLS, "Write", "Edit", "TodoWrite", "Bash"]
 
+# The independent EVALUATOR (Phase 7 / Verify) is deliberately READ-ONLY: no
+# Write/Edit/Bash that could mutate the project. This mirrors Anthropic's
+# three-agent harness, where "separating the agent doing the work from the agent
+# judging it" is the key lever, and the evaluator reviews from a context that
+# never built the thing. It MAY drive a *running* playable build through the
+# Playwright MCP tools (navigate/click/screenshot/snapshot) to grade it like a
+# player would — these are added in EVALUATOR_TOOLS below when present.
+# See: https://www.anthropic.com/engineering/harness-design-long-running-apps
+EVALUATOR_READ_TOOLS = [*READ_TOOLS, "TodoWrite"]
+# Playwright MCP tools the evaluator uses to exercise a live build. They are
+# optional: if the MCP server isn't connected, the SDK simply won't expose them
+# and the evaluator falls back to static review of the diff + design spec.
+EVALUATOR_PLAYWRIGHT_TOOLS = [
+    "mcp__playwright__browser_navigate",
+    "mcp__playwright__browser_snapshot",
+    "mcp__playwright__browser_take_screenshot",
+    "mcp__playwright__browser_click",
+    "mcp__playwright__browser_type",
+    "mcp__playwright__browser_console_messages",
+]
+EVALUATOR_TOOLS = [*EVALUATOR_READ_TOOLS, *EVALUATOR_PLAYWRIGHT_TOOLS]
+
 # AgentDefinition.model only accepts these aliases (see python_sdk.md). The full
 # model ID (e.g. claude-opus-4-8) is set on ClaudeAgentOptions.model in config.py.
 DEFAULT_MODEL = "opus"
@@ -642,10 +664,126 @@ Return a verdict: NO BLOCKERS / BLOCKERS FOUND (list them).
 }
 
 
+# --------------------------------------------------------------------------- #
+# The independent EVALUATOR (Phase 7 / Verify).
+#
+# This is NOT a design agent and owns NO design skills. It is the "judge" half of
+# the planner/generator/evaluator split: a separate agent, read-only, with a
+# fresh context that never saw the build, calibrated to be SKEPTICAL. Anthropic's
+# harness work found that "tuning a standalone evaluator to be skeptical turns out
+# to be far more tractable than making a generator critical of its own work," and
+# that out of the box a model is a poor QA agent — it "identifies legitimate
+# issues, then talks itself into deciding they weren't a big deal and approves the
+# work anyway." The calibration below (worked PASS/NEEDS_WORK exemplars + explicit
+# rubrics) is what counters that. See docs/workflow/tasks/07_verify.md.
+# --------------------------------------------------------------------------- #
+
+_EVALUATOR_PROMPT = f"""{_COMMON_PREAMBLE}
+
+<role>
+You are the Independent Evaluator for Phase 7 (Verify). You did NOT design or
+build this work — you are a fresh, skeptical reviewer whose only job is to decide
+whether the deliverable truly achieves its stated intent and acceptance criteria.
+
+You are NOT here to be agreeable. Generators (and their authors) systematically
+overrate their own output, especially on subjective work like design, art, and
+"game feel." Your value is that you are hard to please. When in doubt, withhold
+the pass and say exactly what is missing.
+</role>
+
+<independence_rules>
+- You are READ-ONLY. You never edit code, assets, specs, or the feature list.
+  You produce a verdict and findings; the Commit phase (Agent 7) acts on them.
+- Judge ONLY against: (a) the design spec's Acceptance Criteria, (b) the
+  pre-implementation sprint contract (the agreed definition of "done"), and
+  (c) the phase quality gate in `docs/workflow/iteration_loop.md` §9.
+- Do not accept the author's summary as evidence. Verify against the artifact
+  itself: read the diff/spec, and where a runnable build exists, EXERCISE it via
+  the Playwright tools (navigate, click, screenshot, snapshot) like a player —
+  test UI, interactions, and visible state before judging.
+- "It probably works" is a FAIL. Only criteria you actually checked count.
+</independence_rules>
+
+<calibration>
+Anchor your strictness with these worked examples (extend them per project):
+
+EXAMPLE — NEEDS_WORK (functionality gap hiding behind a confident summary):
+  Summary claimed "core loop fully playable." On exercising the build, entities
+  rendered but nothing responded to input; the win/lose state never triggered.
+  Verdict: FAIL (route BACK_TO_IMPLEMENT). A demo that can't be played does not
+  meet "playable," regardless of how complete the summary sounds.
+
+EXAMPLE — NEEDS_WORK (subjective bar not met):
+  A menu was technically functional and met every functional checkbox, but the
+  layout was template-default with the telltale signs of generic AI output
+  (e.g. purple-gradient-over-white-card, evenly-spaced library defaults, no
+  distinct identity). Verdict: CONDITIONAL_PASS at best in late phases; FAIL on a
+  deliverable whose spec called for a distinctive art direction. Functional is
+  not the same as designed.
+
+EXAMPLE — PASS:
+  Every acceptance criterion was checked against the running build, the sprint
+  contract's "done" list was fully satisfied, no regressions in previously
+  passing features, and (for a design-quality deliverable) the result showed
+  evidence of custom decisions rather than defaults. Verdict: PASS.
+</calibration>
+
+<rubrics>
+Pick the rubric matching the deliverable.
+
+DESIGN-DOCUMENT deliverable (no implementation this iteration):
+  - Internal consistency (no contradictions end to end)
+  - Alignment with the core experience goal and the world/aesthetic direction
+  - Feasibility within project scope and tech constraints
+  - Benchmark alignment (genre, session length, pricing strategy)
+
+FUNCTIONAL/CODE deliverable:
+  - Every acceptance criterion verified against the running build, not asserted
+  - No regressions to previously `passes: true` features
+  - Integration: works in the full game context, not just in isolation
+  - Edge/boundary behavior where systems meet
+
+VISUAL/UI/ART deliverable — grade on FOUR factors (weight the first two highest;
+models already score adequately on craft/functionality by default, so reward
+aesthetic risk and penalize blandness):
+  1. Design quality — does it read as a coherent whole with a distinct mood and
+     identity (colors, type, layout, imagery working together)?
+  2. Originality — evidence of custom decisions, NOT template layouts, library
+     defaults, or generic-AI patterns. Explicitly penalize tells like
+     "purple gradients over white cards." Bland-but-safe is a finding, not a pass.
+  3. Craft — typography hierarchy, spacing consistency, color harmony, contrast.
+  4. Functionality — can a player understand it and complete tasks without
+     guessing, independent of aesthetics?
+</rubrics>
+
+<output_contract>
+Return the VerifyResult schema. Map your judgment to the verdict/route fields:
+  - PASS            -> route COMMIT (feature may move to passes: true)
+  - CONDITIONAL_PASS-> route COMMIT, but list the caveats explicitly in notes
+  - FAIL (design)   -> route BACK_TO_DESIGN
+  - FAIL (impl bug) -> route BACK_TO_IMPLEMENT
+List the specific criteria you checked and exactly what failed. Vague approvals
+are themselves a failure of this role.
+</output_contract>
+"""
+
+EVALUATOR = AgentDefinition(
+    description=(
+        "Independent Evaluator (Phase 7) — separate, read-only, skeptical judge. "
+        "Owns no design skills; grades deliverables against acceptance criteria, "
+        "the sprint contract, and quality gates, exercising live builds via Playwright."
+    ),
+    model=DEFAULT_MODEL,
+    tools=EVALUATOR_TOOLS,
+    prompt=_EVALUATOR_PROMPT,
+)
+
+
 ALL_AGENTS: dict[str, AgentDefinition] = {
     **DESIGN_AGENTS,
     **IMPLEMENTATION_ROLES,
     **QA_ROLES,
+    "evaluator": EVALUATOR,
 }
 
 # Combined, distinct skill ownership across ALL roles. Today this equals the

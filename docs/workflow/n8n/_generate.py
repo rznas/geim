@@ -35,17 +35,22 @@ PHASES = [
     ("04", "design", "DESIGN",
      "Features: {{ $json.structured_output ? ($json.structured_output.feature_ids || []).join(', ') : '' }} | "
      "Design is deliverable: {{ $json.structured_output ? $json.structured_output.design_is_deliverable : '?' }} | "
-     "Consistent: {{ $json.structured_output ? $json.structured_output.cross_review_consistent : '?' }}"),
+     "Consistent: {{ $json.structured_output ? $json.structured_output.cross_review_consistent : '?' }} | "
+     "Contract items: {{ $json.structured_output ? ($json.structured_output.sprint_contract || []).length : '?' }} | "
+     "Contract approved: {{ $json.structured_output ? $json.structured_output.contract_approved_by_evaluator : '?' }}"),
     ("05", "implement", "IMPLEMENT",
      "Build compiles: {{ $json.structured_output ? $json.structured_output.build_compiles : '?' }} | "
      "Design gaps: {{ $json.structured_output ? ($json.structured_output.design_gaps || []).length : '?' }}"),
     ("06", "test", "TEST",
      "Verdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | "
      "Bugs: {{ $json.structured_output ? ($json.structured_output.bugs || []).length : '?' }}"),
-    ("07", "verify", "VERIFY",
+    ("07", "verify", "VERIFY (independent evaluator)",
      "Verdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | "
      "Route: {{ $json.structured_output ? $json.structured_output.route : '?' }} | "
-     "Verified: {{ $json.structured_output ? ($json.structured_output.verified_feature_ids || []).join(', ') : '' }}"),
+     "Verified: {{ $json.structured_output ? ($json.structured_output.verified_feature_ids || []).join(', ') : '' }} | "
+     "Exercised build: {{ $json.structured_output ? $json.structured_output.exercised_build : '?' }} | "
+     "Criteria checked: {{ $json.structured_output ? ($json.structured_output.criteria_checked || []).length : '?' }} | "
+     "Findings: {{ $json.structured_output ? ($json.structured_output.findings || []).length : '?' }}"),
     ("08", "commit", "COMMIT",
      "Commit made: {{ $json.structured_output ? $json.structured_output.commit_made : '?' }} | "
      "SHA: {{ $json.structured_output ? $json.structured_output.commit_sha : '' }} | "

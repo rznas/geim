@@ -1,5 +1,5 @@
 {
-  "name": "GameDev \u2014 Phase 07 Verify",
+  "name": "GameDev \u2014 Phase 07 Verify (Independent Evaluator)",
   "nodes": [
     {
       "parameters": {
@@ -37,7 +37,7 @@
         }
       },
       "id": "http-verify",
-      "name": "Run Verify Phase (Agent SDK)",
+      "name": "Run Verify (Independent Evaluator) Phase (Agent SDK)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -48,8 +48,8 @@
     {
       "parameters": {
         "resume": "form",
-        "formTitle": "Approve Phase: VERIFY",
-        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 VERIFY summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nVerdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | Route: {{ $json.structured_output ? $json.structured_output.route : '?' }} | Verified: {{ $json.structured_output ? ($json.structured_output.verified_feature_ids || []).join(', ') : '' }}",
+        "formTitle": "Approve Phase: VERIFY (independent evaluator)",
+        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 VERIFY (independent evaluator) summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nVerdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | Route: {{ $json.structured_output ? $json.structured_output.route : '?' }} | Verified: {{ $json.structured_output ? ($json.structured_output.verified_feature_ids || []).join(', ') : '' }} | Exercised build: {{ $json.structured_output ? $json.structured_output.exercised_build : '?' }} | Criteria checked: {{ $json.structured_output ? ($json.structured_output.criteria_checked || []).length : '?' }} | Findings: {{ $json.structured_output ? ($json.structured_output.findings || []).length : '?' }}",
         "formFields": {
           "values": [
             {
@@ -116,13 +116,13 @@
             {
               "id": "a5",
               "name": "structured_output",
-              "value": "={{ $('Run Verify Phase (Agent SDK)').item.json.structured_output }}",
+              "value": "={{ $('Run Verify (Independent Evaluator) Phase (Agent SDK)').item.json.structured_output }}",
               "type": "object"
             },
             {
               "id": "a6",
               "name": "result_text",
-              "value": "={{ $('Run Verify Phase (Agent SDK)').item.json.result_text }}",
+              "value": "={{ $('Run Verify (Independent Evaluator) Phase (Agent SDK)').item.json.result_text }}",
               "type": "string"
             }
           ]
@@ -144,14 +144,14 @@
       "main": [
         [
           {
-            "node": "Run Verify Phase (Agent SDK)",
+            "node": "Run Verify (Independent Evaluator) Phase (Agent SDK)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Run Verify Phase (Agent SDK)": {
+    "Run Verify (Independent Evaluator) Phase (Agent SDK)": {
       "main": [
         [
           {

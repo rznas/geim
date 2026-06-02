@@ -67,6 +67,18 @@ class DesignResult(PhaseResult):
         description="True in early phases where design IS the output; orchestrator then skips Implement+Test.",
     )
     cross_review_consistent: bool
+    # Sprint contract: the agreed, testable definition of "done" negotiated BEFORE
+    # implementation, and signed off by the independent evaluator so the generator
+    # builds the right thing (Anthropic harness "sprint contract"). For
+    # design-only iterations this is the acceptance-criteria list itself.
+    sprint_contract: list[str] = Field(
+        default_factory=list,
+        description="Testable 'done' criteria agreed before Implement (the sprint contract).",
+    )
+    contract_approved_by_evaluator: bool = Field(
+        default=False,
+        description="True once the independent evaluator approved the sprint contract pre-implementation.",
+    )
 
 
 class ImplementResult(PhaseResult):
@@ -84,6 +96,21 @@ class VerifyResult(PhaseResult):
     verdict: VerifyVerdict
     route: VerifyRoute = Field(description="Where the loop goes next.")
     verified_feature_ids: list[str] = Field(default_factory=list)
+    # The independent evaluator must show its work: which acceptance criteria /
+    # contract items it actually checked, and what failed. Empty findings on a
+    # PASS is itself suspect (the evaluator is calibrated to be skeptical).
+    criteria_checked: list[str] = Field(
+        default_factory=list,
+        description="Acceptance/contract criteria the evaluator actually verified (not asserted).",
+    )
+    findings: list[str] = Field(
+        default_factory=list,
+        description="Specific issues found; on FAIL these justify the route, on PASS they list any caveats.",
+    )
+    exercised_build: bool = Field(
+        default=False,
+        description="True if the evaluator ran the live build (e.g. via Playwright) rather than static review only.",
+    )
 
 
 class CommitResult(PhaseResult):

@@ -62,12 +62,22 @@ This is where the 16 previously-uncovered roles from `docs/team_roles/_main.md` 
 
 ## Actions
 
-### Step 1: Read the implementation brief
+### Step 1: Read the implementation brief and the sprint contract
 
 Every implementation role reads:
 1. The implementation brief for their discipline
 2. The relevant design spec sections
 3. Any referenced style guides or technical constraints
+4. **The sprint contract** at the bottom of the brief — the evaluator-approved,
+   testable definition of "done" agreed *before* this phase. This is your target:
+   build to satisfy every contract item, because Phase 7 (Verify) grades the
+   running build against exactly this list. Do not silently narrow it; if an item
+   turns out to be wrong or infeasible, flag it back (Step 5) rather than dropping it.
+
+> **Handoff discipline:** work from the compiled brief + contract + the named spec
+> sections, *not* from the design agents' full transcripts. The brief is the
+> compressed, authoritative handoff — a focused contract beats thousands of tokens
+> of upstream reasoning, and keeps each role building the same agreed thing.
 
 ### Step 2: Plan the implementation
 
@@ -238,8 +248,9 @@ This prevents the common indie trap of "coding while arting while designing" —
 
 ## Quality Criteria
 
-- [ ] Implementation brief was read before starting
+- [ ] Implementation brief **and sprint contract** were read before starting
 - [ ] Every artifact traces to a design spec
+- [ ] Every sprint-contract item is addressed (or flagged back, not silently dropped)
 - [ ] Code compiles and build runs
 - [ ] Assets are in correct formats and directories
 - [ ] Audio plays correctly in-engine

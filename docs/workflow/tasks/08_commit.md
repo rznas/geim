@@ -29,9 +29,9 @@ This is the "clean state" protocol from the Anthropic harness. A successful comm
 
 ## Actions (Execute in Order)
 
-### Step 1: Update feature list
+### Step 1: Update feature list — then run the guard
 
-Open `docs/workflow/feature_list.json`. For each feature verified as PASS:
+Open `docs/workflow/feature_list.json`. For each feature the **independent evaluator** passed in Phase 7:
 
 ```json
 // BEFORE
@@ -43,10 +43,18 @@ Open `docs/workflow/feature_list.json`. For each feature verified as PASS:
 
 **Rules:**
 - Only change `passes` from `false` → `true`
-- Only for features that passed verification THIS iteration
+- Only for features the evaluator passed THIS iteration (verdict PASS / CONDITIONAL PASS)
 - NEVER delete features
 - NEVER edit feature descriptions
-- If a feature regressed during this iteration, change it from `true` → `false` and note the reason
+- If a feature regressed during this iteration, change it from `true` → `false` **and add a `note` field declaring the regression** (a silent regression is rejected by the guard), then file a P0 backlog item
+
+**Then validate mechanically** (`iteration_loop.md` §8). The guard checks the sacred invariants as code — shape, append-only, immutable descriptions, no silent `true→false`:
+
+```bash
+cd agents && uv run python -m game_agents.feature_list ../docs/workflow/feature_list.json
+```
+
+For the full cross-version check (append-only / no-reword / no-silent-regression) the guard diffs the working file against the committed `HEAD` version. If validation fails, **fix the feature list before committing** — do not commit a corrupted registry. (CI also runs `agents/tests/test_feature_list.py`.)
 
 ### Step 2: Append to progress log
 
@@ -125,8 +133,8 @@ After committing, run this final check:
 CLEAN STATE VERIFICATION
 ════════════════════════
 [ ] git status shows clean working tree (nothing uncommitted)
-[ ] feature_list.json is valid JSON (no syntax errors)
-[ ] progress.md has an entry for this iteration
+[ ] feature_list.json passes the guard (valid + append-only + no silent regression)
+[ ] progress.md has an entry for this iteration (tagged (FAST-PATH) if applicable)
 [ ] backlog.md reflects current priorities
 [ ] No design documents reference deleted or renamed files
 [ ] No half-implemented features left in codebase

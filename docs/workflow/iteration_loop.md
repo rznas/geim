@@ -1,6 +1,6 @@
 # Game Development Iteration Loop
 
-**Purpose:** The single entry-point document for every development iteration. Each cycle follows a structured loop — inspired by [Anthropic's long-running agent harness](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — that ensures incremental progress, clean handoffs, and full traceability across the 7-agent design team.
+**Purpose:** The single entry-point document for every development iteration. Each cycle follows a structured loop — inspired by Anthropic's long-running agent harness work ([effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) and the follow-up [harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)) — that ensures incremental progress, clean handoffs, and full traceability across the 7-agent design team.
 
 **Core Principle:** Treat each iteration like a fresh context window. An agent (or human) arriving at the start of a cycle must be able to orient themselves entirely from the artifacts left by previous cycles, choose the next highest-priority work, execute it incrementally, verify it, and leave the project in a clean state.
 
@@ -20,6 +20,8 @@
 8. [Feature List Protocol](#8-feature-list-protocol)
 9. [Quality Gates](#9-quality-gates)
 10. [Benchmark Alignment Checks](#10-benchmark-alignment-checks)
+11. [The Independent Evaluator](#11-the-independent-evaluator)
+12. [Lightweight Fast-Path](#12-lightweight-fast-path-cost-control)
 
 ### Task Documents
 
@@ -55,6 +57,9 @@ The key failure modes of long-running agents — and long-running game projects 
 | One-shotting the entire task | Trying to design the whole game in one pass | Incremental progress — one feature/system per iteration |
 | Spending time re-discovering context | New team member (or agent) wastes time figuring out project state | Progress log + dependency graph read at start of every cycle |
 | Marking features done without testing | Design docs that were never playtested or validated | Mandatory verification phase before marking anything "passes" |
+| **Grading your own homework** (self-evaluation bias) | Authors call their own design/art "good"; the bar quietly drops | **Independent evaluator** (Phase 7) — a separate, read-only, skeptical judge; see [§11](#11-the-independent-evaluator) |
+| **Building the wrong thing** | Implementing to a vague spec, then arguing about "done" afterward | **Sprint contract** — testable "done" agreed and evaluator-approved *before* Implement |
+| **Lossy handoffs** | A role inherits a wall of upstream notes and misses the point | Compressed, authoritative handoffs (the implementation brief + contract), not raw transcripts |
 
 ### Design Principles
 
@@ -62,7 +67,16 @@ The key failure modes of long-running agents — and long-running game projects 
 2. **Clean state in, clean state out.** Every iteration starts by reading state. Every iteration ends by writing state. No exceptions.
 3. **Verify before advancing.** Nothing moves to "done" without passing its quality gate. Design documents get reviewed. Mechanics get prototyped. Prototypes get playtested.
 4. **Dependencies are explicit.** If your work requires another agent's output, that dependency is declared upfront and checked at iteration start.
-5. **The feature list is sacred.** Features can be added. Their status can change from `failing` to `passing`. They are never deleted or silently modified.
+5. **The feature list is sacred.** Features can be added. Their status can change from `failing` to `passing`. They are never deleted or silently modified. This rule is now also enforced *mechanically* — see [§8](#8-feature-list-protocol).
+6. **The maker is not the judge.** The agent that designs/builds a deliverable never decides whether it passes. Phase 7 is run by a separate, read-only, skeptical **evaluator** — the strongest single lever for reliable long-running output ([harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)). See [§11](#11-the-independent-evaluator).
+7. **Agree "done" before building.** Every implementation iteration starts from a **sprint contract**: testable acceptance criteria the evaluator approves *before* Implement, so the maker and judge share one definition of done.
+8. **Handoffs are compressed, not copied.** Each phase consumes the compiled brief + contract + named spec sections — not the upstream agent's full transcript. A focused handoff beats a flood of context.
+
+### A note on context: reset vs compaction
+
+Anthropic's first harness (built for an earlier model) cleared the context window between work units — a hard **reset** plus a structured handoff — to avoid two failure modes: losing coherence as the window fills, and "context anxiety," where a model wraps up prematurely because it thinks it's near its limit. Their follow-up found newer, more capable models "largely removed that behavior on [their] own," letting them **drop context resets entirely** and run one continuous session with the SDK's automatic compaction handling growth.
+
+**Guidance for this project (running on a current Opus model):** prefer **one continuous session per iteration with automatic compaction**; do *not* hard-reset context between phases by default. The phase artifacts (progress log, feature list, brief, contract) exist so that a reset is *possible* and cheap when you need it — e.g. if you observe premature wrap-up on a long Production iteration, or you deliberately want the evaluator to start from a context that never saw the build (which Phase 7 requires regardless). Reach for a reset as a targeted tool, not a per-phase ritual.
 
 ---
 
@@ -315,18 +329,19 @@ Each phase has a detailed standalone task document in `docs/workflow/tasks/`. Th
 
 ### Phase 7: VERIFY — [Full doc: 07_verify.md](tasks/07_verify.md)
 
-**Goal:** Confirm the deliverable achieves its *design intent*, not just technical correctness.
+**Goal:** Confirm the deliverable achieves its *design intent* and its agreed bar, not just technical correctness.
 
-**Roles:** Cross-role review — design agents who authored spec + Agent 7 + affected agents
+**Role:** The **independent evaluator** — a *separate*, read-only, skeptical agent that did **not** design or build this work (see [§11](#11-the-independent-evaluator)). It judges against the spec's acceptance criteria, the **sprint contract**, and the §9 quality gate. It exercises a live build (Playwright) where one exists. The design agents and Agent 7 may consult, but the verdict is the evaluator's.
 
 **Checks:**
 
-1. Design intent — does implementation match the spec?
-2. Technical quality — all tests passed?
+1. Design intent — does the artifact match the spec and the contract?
+2. Technical quality — all tests passed, verified against the running build?
 3. Integration — works in context of full game?
 4. Project fit — within scope, benchmark-aligned?
+5. For visual deliverables — the four-factor rubric (design quality, originality, craft, functionality).
 
-**Verdicts:** PASS → feature moves to `passes: true` | CONDITIONAL PASS → passes with caveats | FAIL → route back to Design or Implement
+**Verdicts:** PASS → feature moves to `passes: true` | CONDITIONAL PASS → passes with caveats | FAIL → route back to Design or Implement. For subjective deliverables, a tight **generator↔evaluator inner loop** (5–15 cycles) may run within Phases 5–7 before the verdict.
 
 **Time budget:** ~10% of iteration
 
@@ -605,9 +620,26 @@ Adapted from the Anthropic harness where "it is unacceptable to remove or edit t
 
 1. **Agent 7 creates features** during initialization and at the start of new project phases.
 2. **Any agent can propose new features** — but they must be reviewed and added by Agent 7.
-3. **Features are marked passing ONLY by the agent that owns the verification**, after the quality gate is passed.
-4. **A feature that regresses** (was passing, now failing due to design changes) must be immediately flagged in progress.md and added to the backlog as P0.
+3. **Features are marked passing ONLY after the independent evaluator passes them** at the quality gate (Phase 7). The Commit phase performs the status flip.
+4. **A feature that regresses** (was passing, now failing due to design changes) must be immediately flagged in progress.md, carry a `note` explaining the regression, and be added to the backlog as P0.
 5. **Feature IDs are permanent.** `CM-001` is always `CM-001`, even if the project pivots.
+
+### Mechanical enforcement (new)
+
+These rules are no longer prose-only. The guard in `agents/game_agents/feature_list.py` validates the invariants as code and is covered by `agents/tests/test_feature_list.py`:
+
+- **Shape:** valid JSON; every feature has the required keys; `passes` is boolean; `priority ∈ {P0,P1,P2,P3}`; ids are unique.
+- **Append-only:** `diff(before, after)` rejects any deleted feature.
+- **Immutable descriptions:** rejects any edit to a feature's `description` after creation (to change scope, add a *new* feature and mark the old one superseded).
+- **No silent regression:** rejects a `passes` flip `true → false` unless the feature carries a `note` declaring the regression.
+
+Run it any time against the working file:
+
+```bash
+cd agents && uv run python -m game_agents.feature_list ../docs/workflow/feature_list.json
+```
+
+The Commit phase ([08_commit.md](tasks/08_commit.md)) runs this guard (diffing the about-to-commit file against the committed `HEAD` version) so a violation fails the iteration loudly instead of corrupting the project's shared memory.
 
 ### Feature Lifecycle
 
@@ -664,6 +696,15 @@ Each project phase has specific quality criteria that must be met before the pro
 | Aesthetic direction is documented and consistent | Agent 5 style guide completeness |
 | Social features align with player motivations | Agent 6 + Agent 1 alignment check |
 | All systems work together without contradiction | Cross-agent integration review |
+| Visual deliverables pass the **four-factor rubric** | Independent evaluator scores **design quality, originality, craft, functionality** — weighting the first two highest, penalizing generic-AI tells (e.g. "purple gradients over white cards"). *Functional ≠ designed.* |
+
+> **Four-factor design rubric (from [harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)).** Applied by the independent evaluator to any look-and-feel deliverable, at any phase — not only at the Polish gate:
+> 1. **Design quality** — coherent whole with a distinct mood and identity.
+> 2. **Originality** — custom decisions, *not* template/library/AI defaults. Bland-but-safe is a finding, not a pass.
+> 3. **Craft** — typography hierarchy, spacing, color harmony, contrast.
+> 4. **Functionality** — usable independent of aesthetics.
+>
+> Weight 1–2 highest: agents already score adequately on craft/functionality by default, so the evaluator rewards aesthetic risk and penalizes blandness. Full procedure in [07_verify.md](tasks/07_verify.md).
 
 ### Phase Gate: Business (Skills 7.1, 7.2, 7.3)
 
@@ -713,6 +754,84 @@ At the start of every 5th iteration (or at every phase gate), Agent 7 runs a ben
 - [ ] Agent skills cover all required design work
 - [ ] Implementation roles (programming, art production, QA) staffing plan exists
 ```
+
+---
+
+## 11. The Independent Evaluator
+
+Phase 7 (Verify) is run by a dedicated agent that is structurally separate from every agent that designs or builds. This is the project's implementation of the planner / generator / **evaluator** split from Anthropic's [harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps).
+
+### Why it exists
+
+> "When asked to evaluate work they've produced, agents tend to respond by confidently praising the work — even when, to a human observer, the quality is obviously mediocre. This is particularly pronounced for subjective tasks like design."
+
+The fix is not to make the maker more self-critical — that barely works — but to **hand judgment to a different agent**:
+
+> "Tuning a standalone evaluator to be skeptical turns out to be far more tractable than making a generator critical of its own work."
+
+Almost everything this project produces (mechanics, levels, art direction, "feel") is subjective, so this bias hits us hard. The evaluator is the countermeasure.
+
+### How it is wired (`agents/game_agents/`)
+
+| Property | Value | Why |
+|---|---|---|
+| Identity | `evaluator` agent in `agents.py` (not one of the 7 design agents; owns no skills) | Independence from the makers |
+| Tools | **Read-only** (`Read/Grep/Glob`) + Playwright MCP (`browser_navigate/snapshot/screenshot/click/type/console`) | Can inspect and *exercise a live build*, but never mutate what it grades |
+| Driver | `phases.py` routes the **verify** phase through the evaluator; every other phase runs as Agent 7 | Keeps judge ≠ maker at the orchestration layer |
+| Calibration | Few-shot PASS/NEEDS_WORK exemplars + explicit rubrics in its prompt | "Out of the box, [a model] is a poor QA agent"; calibration is what makes its verdict mean something |
+| Output | `VerifyResult` with `criteria_checked`, `findings`, `exercised_build` | Forces it to show its work; vague approvals are themselves a failure |
+
+### What it judges against
+
+1. The design spec's **acceptance criteria**.
+2. The **sprint contract** — the testable "done" it approved *before* implementation.
+3. The phase **quality gate** in [§9](#9-quality-gates), including the four-factor rubric for visual deliverables.
+
+It exercises a live build where one exists, and for subjective deliverables it can drive a tight **generator↔evaluator inner loop** (5–15 cycles) within Phases 5–7 before issuing a verdict. Full procedure: [07_verify.md](tasks/07_verify.md).
+
+> **Human-in-the-loop unchanged.** The independent evaluator does not remove the human approval gate in the n8n workflows — it makes the *agent's* verdict trustworthy enough that the human is approving a real judgment, not a rubber stamp. Initial calibration of the evaluator (tuning its exemplars/criteria) is a human responsibility.
+
+---
+
+## 12. Lightweight Fast-Path (Cost Control)
+
+The full loop is deliberately heavyweight — 7 design agents, 16 implementation roles, an independent evaluator, per-phase human approval. That rigor earns its cost on real features (Anthropic measured a full harness fixing bugs a solo agent shipped), **but the same harness on a trivial change is pure overhead** — in their retro-game-maker example the full harness cost **~20× a solo pass ($200 vs $9)**. Multi-agent setups also carry large token overhead, so reserve the full ceremony for work that genuinely benefits from specialization, parallelism, or critique.
+
+### When the fast-path applies
+
+A work item qualifies for the fast-path only if **all** hold:
+
+- It is **cosmetic or trivial** (a copy tweak, a value tune, a one-line config, a typo, a doc fix).
+- It touches **no `passes: true` feature's behavior** and crosses **no system boundary**.
+- It needs **no new design decision** (it implements something already specified).
+- It is **reversible** and small enough to eyeball.
+
+If any condition fails, run the full loop. When unsure, run the full loop.
+
+### The fast-path itself
+
+```mermaid
+flowchart LR
+    O["Orient (light)\nread state"]
+    T["Triage\nstill clean?"]
+    X["Make the change\n(single role)"]
+    V["Evaluator (light)\ncheck it + no regression"]
+    C["Commit\n+ feature-list guard"]
+
+    O --> T --> X --> V --> C
+
+    style O fill:#1a73e8,color:#fff
+    style T fill:#e8710a,color:#fff
+    style X fill:#1565c0,color:#fff
+    style V fill:#ad1457,color:#fff
+    style C fill:#37474f,color:#fff
+```
+
+- **Skipped:** the full Design agent activation, the implementation-role fan-out, and the inner loop. Select still names the one item; one role makes the change.
+- **NOT skipped — non-negotiable:** Triage (don't build on broken state), the **independent evaluator's** regression check (even if light), the **feature-list guard**, and the clean-state commit. The fast-path trims *ceremony*, never the safety rails.
+- **Logging:** the progress entry is tagged `(FAST-PATH)` so the history shows which iterations were lightweight.
+
+The orchestrator chooses the path at Select; see [03_select.md](tasks/03_select.md) and [orchestrator.md](orchestrator.md).
 
 ---
 
@@ -809,4 +928,5 @@ Copy-paste this checklist at the start of every cycle:
 
 | Reference | Purpose |
 |---|---|
-| [Anthropic: Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) | Architectural inspiration for the iteration loop |
+| [Anthropic: Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) | Architectural inspiration for the iteration loop (feature list, progress file, clean-state, initializer) |
+| [Anthropic: Harness Design for Long-Running Application Development](https://www.anthropic.com/engineering/harness-design-long-running-apps) | Basis for the planner/generator/**evaluator** split, the **sprint contract**, the **four-factor design rubric**, the generator↔evaluator inner loop, and the reset-vs-compaction guidance |

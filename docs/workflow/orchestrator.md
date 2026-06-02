@@ -320,6 +320,68 @@ flowchart TD
 - [ ] Session length matches benchmark target
 - [ ] Team is confident this is worth full production investment
 - [ ] Agent 7 approves production start
+- [ ] **Vertical slice scheduled** as the first Production milestone (see below)
+
+> **Prototype ≠ vertical slice.** The prototype proves the loop is **fun** and is allowed to be ugly (gray-box, placeholder). It does *not* prove the game is shippable or that the full pipeline works. That is the vertical slice's job — and it is the next gate.
+
+---
+
+## 4b. Gate: Vertical Slice (first Production milestone)
+
+**Duration:** within the first ~10-20% of Production (a handful of focused iterations)  
+**Goal:** Prove, with **one polished chunk**, that the game is worth scaling — *before* committing the full production budget. This is the games-industry counterpart to "build one feature end-to-end at ship quality first," and the natural place to first run the independent evaluator's four-factor rubric and the generator↔evaluator inner loop on a real build.
+
+### What a vertical slice is
+
+A **3-5 minute slice of the real game at shippable quality** that cuts vertically through **every** discipline at once — design, code, art, animation, audio, UI/UX, and QA — for one representative piece of content. Not a whole level; one polished, representative chunk.
+
+| Property | Prototype (Phase 3) | Vertical Slice (this gate) |
+|---|---|---|
+| Proves | "Is it fun?" | "Is it shippable? Does the full pipeline work?" |
+| Visual quality | Gray-box / placeholder | **Final / ship quality** for the slice |
+| Disciplines exercised | Mostly programming + design | **All** (incl. art, audio, UI, QA, compliance smoke) |
+| Audience | Internal | Internal + can anchor a pitch / Steam Next Fest demo |
+| Scope trap to avoid | — | Polishing visuals before the loop is proven; "hero mode" crunch; obvious placeholders left in |
+
+### Active Roles
+
+The first **full-stack** iteration set: all 7 design agents as needed, the relevant programming + **all** art-production roles, **audio**, QA, and the **independent evaluator** running the four-factor rubric against the live build. Agent 7 owns the gate.
+
+### Iteration Focus
+
+```mermaid
+flowchart TD
+    VS1["<b>Pick the slice</b>\nOne representative chunk that\nexercises the core loop + the\ndisciplines that define the game"]
+    VS2["<b>Build it to ship quality</b>\nFull pipeline: code + final art +\nanimation + audio + UI\n(generator↔evaluator inner loop)"]
+    VS3["<b>Evaluator grades the live build</b>\nFour-factor rubric (design quality,\noriginality, craft, functionality)\n+ acceptance criteria via Playwright"]
+    VSG{"<b>VERTICAL SLICE GATE</b>\n<i>Agent 7</i>"}
+    VSpass["Scale up: full Production"]
+    VSiter["Iterate the slice"]
+    VSpivot["Re-scope / pivot before\nspending the full budget"]
+
+    VS1 --> VS2 --> VS3 --> VSG
+    VSG -->|Slice is fun AND ship-quality AND pipeline proven| VSpass
+    VSG -->|Close, needs another pass| VSiter
+    VSG -->|Pipeline or quality can't reach the bar at this scope| VSpivot
+    VSiter --> VS2
+
+    style VS1 fill:#2e7d32,color:#fff
+    style VS2 fill:#1565c0,color:#fff
+    style VS3 fill:#ad1457,color:#fff
+    style VSG fill:#e65100,color:#fff
+```
+
+### Gate Exit Criteria
+
+- [ ] One 3-5 min slice plays at **ship quality** end-to-end
+- [ ] The slice exercises **every** discipline that defines the game (art, audio, UI, not just code)
+- [ ] Independent evaluator passes it on the **four-factor rubric** against the live build (originality not skipped — no placeholder/template tells)
+- [ ] No obvious placeholders inside the slice; achieved **without** unsustainable crunch
+- [ ] The full content pipeline (concept → asset → in-engine → polished) is proven repeatable
+- [ ] Benchmark alignment holds at production quality (session feel, art bar, performance on min-spec)
+- [ ] Agent 7 confirms the slice justifies scaling to full Production
+
+> If the slice can't reach the bar at the current scope, this is the **cheapest** place to re-scope or pivot — far cheaper than discovering it in Alpha.
 
 ---
 
@@ -836,6 +898,8 @@ flowchart TD
     G2{"<b>GATE 2</b>\nAll core systems designed?\nImpl briefs ready?\nNo design contradictions?"}
     PROTO["<b>PROTOTYPE</b>"]
     G3{"<b>GATE 3</b>\nCore loop fun?\n3+ playtests done?\nTech proven viable?"}
+    VSLICE["<b>VERTICAL SLICE</b>\n(first Production milestone)"]
+    GVS{"<b>GATE VS</b>\n3-5 min at ship quality?\nAll disciplines exercised?\nPipeline proven?\nEvaluator passes 4-factor rubric?"}
     PROD["<b>PRODUCTION</b>"]
     G4{"<b>GATE 4</b>\nAll features implemented?\n>80% features passing?\nFeature lock declared?"}
     ALPHA["<b>ALPHA</b>"]
@@ -850,7 +914,8 @@ flowchart TD
 
     CONCEPT --> G1 --> PREPROD
     PREPROD --> G2 --> PROTO
-    PROTO --> G3 --> PROD
+    PROTO --> G3 --> VSLICE
+    VSLICE --> GVS --> PROD
     PROD --> G4 --> ALPHA
     ALPHA --> G5 --> BETA
     BETA --> G6 --> POLISH
@@ -860,6 +925,7 @@ flowchart TD
     style CONCEPT fill:#1a73e8,color:#fff
     style PREPROD fill:#1a73e8,color:#fff
     style PROTO fill:#2e7d32,color:#fff
+    style VSLICE fill:#2e7d32,color:#fff
     style PROD fill:#e65100,color:#fff
     style ALPHA fill:#c62828,color:#fff
     style BETA fill:#c62828,color:#fff
@@ -869,6 +935,7 @@ flowchart TD
     style G1 fill:#ffd54f,color:#333
     style G2 fill:#ffd54f,color:#333
     style G3 fill:#ffd54f,color:#333
+    style GVS fill:#ffd54f,color:#333
     style G4 fill:#ffd54f,color:#333
     style G5 fill:#ffd54f,color:#333
     style G6 fill:#ffd54f,color:#333
@@ -884,11 +951,14 @@ flowchart TD
 |---|---|
 | No code exists, only design docs | Concept or Pre-Production |
 | There's a playable but ugly prototype | Prototype |
+| One chunk is polished to ship quality across all disciplines | Vertical Slice (entering Production) |
 | Features are being built, art is being produced | Production |
 | All features done, fixing bugs | Alpha |
 | External testers are playing | Beta |
 | Submitting to platform stores | Polish & Certification |
 | Game is live, players are buying | Launch / Post-Launch |
+
+> **Iteration weight scales with the work, not just the phase.** Within any phase, trivial/cosmetic items take the **lightweight fast-path** (`iteration_loop.md` §12) instead of the full agent fan-out. Phase 7 in every phase is run by the **independent evaluator** (`iteration_loop.md` §11).
 
 ---
 
@@ -909,3 +979,6 @@ flowchart TD
 | `docs/team_roles/design_roles.md` | Agent skills and orchestration patterns |
 | `docs/team_roles/_ai_arts_roles.md` | AI art tooling for art production |
 | `docs/benchmarks/main.md` | Market data and strategic positioning |
+| [Anthropic: Harness Design for Long-Running Application Development](https://www.anthropic.com/engineering/harness-design-long-running-apps) | Basis for the independent evaluator, sprint contract, four-factor rubric, and the vertical-slice / fast-path additions |
+
+> Also update `07_verify.md`'s table row: Phase 7 is now run by the **independent evaluator** (skeptical, read-only), not a cross-role self-review.

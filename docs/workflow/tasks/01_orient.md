@@ -12,6 +12,8 @@ Rebuild full project context from artifacts alone — no guessing, no assumption
 
 If you cannot determine the project state from the artifacts, the previous iteration failed to commit cleanly. Flag this immediately and route to [02_triage.md](02_triage.md).
 
+> **Continuous session vs. fresh context.** By default an iteration runs as one continuous session on a current Opus model — automatic compaction handles context growth, so you do **not** hard-reset between phases (see `iteration_loop.md` §1, "reset vs compaction"). Orientation matters most when a session *does* start cold: a new run, a deliberate reset, or the independent evaluator (which is *required* to start from a context that never saw the build). In every case the artifacts below are the sole source of truth — they are written precisely so a cold start loses nothing.
+
 ---
 
 ## Inputs
