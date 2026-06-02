@@ -1,0 +1,1141 @@
+{
+  "name": "GameDev \u2014 00 Iteration Loop Orchestrator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Run Iteration (Manual)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Run Iteration (Schedule)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "i1",
+              "name": "iteration",
+              "value": "={{ $execution.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-iteration",
+      "name": "Set Iteration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        140,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_ORIENT_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ '' }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-orient",
+      "name": "Phase: Orient",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-orient-ok",
+      "name": "Orient Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Orient was rejected by reviewer."
+      },
+      "id": "stop-orient",
+      "name": "Halted: Orient rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        580,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_TRIAGE_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ '' }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-triage",
+      "name": "Phase: Triage",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-triage-ok",
+      "name": "Triage Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Triage was rejected by reviewer."
+      },
+      "id": "stop-triage",
+      "name": "Halted: Triage rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.structured_output.verdict }}",
+              "rightValue": "MAJOR|CRITICAL",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-stabilize",
+      "name": "Triage MAJOR/CRITICAL?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SELECT_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ $('Phase: Triage').item.json.result_text }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-select",
+      "name": "Phase: Select",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1460,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-select-ok",
+      "name": "Select Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Select was rejected by reviewer."
+      },
+      "id": "stop-select",
+      "name": "Halted: Select rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_DESIGN_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ $('Phase: Select').item.json.structured_output.scope_statement }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-design",
+      "name": "Phase: Design",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1900,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-design-ok",
+      "name": "Design Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2120,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Design was rejected by reviewer."
+      },
+      "id": "stop-design",
+      "name": "Halted: Design rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.structured_output.design_is_deliverable }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-design-deliverable",
+      "name": "Design IS deliverable?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2340,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_IMPLEMENT_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ $('Phase: Design').item.json.structured_output.implementation_brief_path }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-implement",
+      "name": "Phase: Implement",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2560,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-impl-ok",
+      "name": "Implement Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2780,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Implement was rejected by reviewer."
+      },
+      "id": "stop-impl",
+      "name": "Halted: Implement rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2780,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_TEST_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ '' }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-test",
+      "name": "Phase: Test",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3000,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-test-ok",
+      "name": "Test Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3220,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Test was rejected by reviewer."
+      },
+      "id": "stop-test",
+      "name": "Halted: Test rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3220,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.structured_output.verdict }}",
+              "rightValue": "MAJOR_BUGS|CRITICAL_BUGS",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-test-blocking",
+      "name": "Test MAJOR/CRITICAL bugs?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3440,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Blocking bugs found \u2014 loop returns to Implement next iteration."
+      },
+      "id": "stop-test-bugs",
+      "name": "Halted: blocking bugs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_VERIFY_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ '' }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-verify",
+      "name": "Phase: Verify",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3660,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-verify-ok",
+      "name": "Verify Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3880,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Verify was rejected by reviewer."
+      },
+      "id": "stop-verify",
+      "name": "Halted: Verify rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3880,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.structured_output.route }}",
+              "rightValue": "COMMIT",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-verify-commit",
+      "name": "Verify route = COMMIT?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4100,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Verify routed back to Design/Implement \u2014 handled next iteration."
+      },
+      "id": "stop-verify-route",
+      "name": "Halted: routed back",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4100,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_COMMIT_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "iteration": "={{ $('Set Iteration').item.json.iteration }}",
+            "context": "={{ '' }}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "exec-commit",
+      "name": "Phase: Commit",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        4320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-commit-ok",
+      "name": "Commit Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration halted \u2014 Commit was rejected by reviewer."
+      },
+      "id": "stop-commit",
+      "name": "Halted: Commit rejected",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4540,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "message": "Iteration complete. Re-run (or wait for schedule) for the next cycle."
+      },
+      "id": "done",
+      "name": "Iteration Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4760,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Run Iteration (Manual)": {
+      "main": [
+        [
+          {
+            "node": "Set Iteration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Iteration (Schedule)": {
+      "main": [
+        [
+          {
+            "node": "Set Iteration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Iteration": {
+      "main": [
+        [
+          {
+            "node": "Phase: Orient",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Orient": {
+      "main": [
+        [
+          {
+            "node": "Orient Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orient Approved?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Triage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Orient rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Triage": {
+      "main": [
+        [
+          {
+            "node": "Triage Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage Approved?": {
+      "main": [
+        [
+          {
+            "node": "Triage MAJOR/CRITICAL?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Triage rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage MAJOR/CRITICAL?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Commit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Phase: Select",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Select": {
+      "main": [
+        [
+          {
+            "node": "Select Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Approved?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Design",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Select rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Design": {
+      "main": [
+        [
+          {
+            "node": "Design Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Design Approved?": {
+      "main": [
+        [
+          {
+            "node": "Design IS deliverable?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Design rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Design IS deliverable?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Verify",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Phase: Implement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Implement": {
+      "main": [
+        [
+          {
+            "node": "Implement Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Implement Approved?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Test",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Implement rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Test": {
+      "main": [
+        [
+          {
+            "node": "Test Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Approved?": {
+      "main": [
+        [
+          {
+            "node": "Test MAJOR/CRITICAL bugs?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Test rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test MAJOR/CRITICAL bugs?": {
+      "main": [
+        [
+          {
+            "node": "Halted: blocking bugs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Phase: Verify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Verify": {
+      "main": [
+        [
+          {
+            "node": "Verify Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Approved?": {
+      "main": [
+        [
+          {
+            "node": "Verify route = COMMIT?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Verify rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify route = COMMIT?": {
+      "main": [
+        [
+          {
+            "node": "Phase: Commit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: routed back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phase: Commit": {
+      "main": [
+        [
+          {
+            "node": "Commit Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Approved?": {
+      "main": [
+        [
+          {
+            "node": "Iteration Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Halted: Commit rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

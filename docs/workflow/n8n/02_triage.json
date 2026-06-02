@@ -1,0 +1,181 @@
+{
+  "name": "GameDev \u2014 Phase 02 Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "iteration",
+              "type": "number"
+            },
+            {
+              "name": "context",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "trigger-triage",
+      "name": "When Called by Orchestrator",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_SDK_BASE_URL }}/phase/triage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ iteration: $json.iteration, context: $json.context }) }}",
+        "options": {
+          "timeout": 1800000
+        }
+      },
+      "id": "http-triage",
+      "name": "Run Triage Phase (Agent SDK)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Approve Phase: TRIAGE",
+        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 TRIAGE summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nVerdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | Stabilization: {{ $json.structured_output ? $json.structured_output.is_stabilization : '?' }}",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Decision",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "approve"
+                  },
+                  {
+                    "option": "reject"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Notes",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "approve-triage",
+      "name": "Human Approval (Form)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        300
+      ],
+      "webhookId": "approve-triage-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "phase",
+              "value": "triage",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "iteration",
+              "value": "={{ $('When Called by Orchestrator').item.json.iteration }}",
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "approved",
+              "value": "={{ $json.Decision === 'approve' }}",
+              "type": "boolean"
+            },
+            {
+              "id": "a4",
+              "name": "approval_notes",
+              "value": "={{ $json.Notes || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "structured_output",
+              "value": "={{ $('Run Triage Phase (Agent SDK)').item.json.structured_output }}",
+              "type": "object"
+            },
+            {
+              "id": "a6",
+              "name": "result_text",
+              "value": "={{ $('Run Triage Phase (Agent SDK)').item.json.result_text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "out-triage",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When Called by Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Run Triage Phase (Agent SDK)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Triage Phase (Agent SDK)": {
+      "main": [
+        [
+          {
+            "node": "Human Approval (Form)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approval (Form)": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "name": "GameDev \u2014 Phase 06 Test",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "iteration",
+              "type": "number"
+            },
+            {
+              "name": "context",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "trigger-test",
+      "name": "When Called by Orchestrator",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_SDK_BASE_URL }}/phase/test",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ iteration: $json.iteration, context: $json.context }) }}",
+        "options": {
+          "timeout": 1800000
+        }
+      },
+      "id": "http-test",
+      "name": "Run Test Phase (Agent SDK)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Approve Phase: TEST",
+        "formDescription": "=Iteration {{ $('When Called by Orchestrator').item.json.iteration }} \u2014 TEST summary:\n\n{{ $json.structured_output ? $json.structured_output.summary : $json.result_text }}\n\nVerdict: {{ $json.structured_output ? $json.structured_output.verdict : '?' }} | Bugs: {{ $json.structured_output ? ($json.structured_output.bugs || []).length : '?' }}",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Decision",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "approve"
+                  },
+                  {
+                    "option": "reject"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Notes",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "approve-test",
+      "name": "Human Approval (Form)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        300
+      ],
+      "webhookId": "approve-test-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "phase",
+              "value": "test",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "iteration",
+              "value": "={{ $('When Called by Orchestrator').item.json.iteration }}",
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "approved",
+              "value": "={{ $json.Decision === 'approve' }}",
+              "type": "boolean"
+            },
+            {
+              "id": "a4",
+              "name": "approval_notes",
+              "value": "={{ $json.Notes || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "structured_output",
+              "value": "={{ $('Run Test Phase (Agent SDK)').item.json.structured_output }}",
+              "type": "object"
+            },
+            {
+              "id": "a6",
+              "name": "result_text",
+              "value": "={{ $('Run Test Phase (Agent SDK)').item.json.result_text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "out-test",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When Called by Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Run Test Phase (Agent SDK)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Test Phase (Agent SDK)": {
+      "main": [
+        [
+          {
+            "node": "Human Approval (Form)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approval (Form)": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
