@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "new-project-from-scratch",
+  "prompt": "Start a new Godot game in C#. Set up a fresh project StarForge and prove it builds and runs (something prints).",
+  "assertions": [
+    {"text": "project.godot declares the C# feature in config/features", "type": "scripted"},
+    {"text": "project.godot has a [dotnet] section", "type": "scripted"},
+    {"text": "A .csproj exists using Godot.NET.Sdk and net8.0", "type": "scripted"},
+    {"text": "A nuget.config exists pointing at a bundled GodotSharp/Tools/nupkgs feed (offline-safe)", "type": "scripted"},
+    {"text": "run/main_scene is set inside the [application] section (not [dotnet])", "type": "scripted"},
+    {"text": "RESULT.md reports dotnet build succeeded and a headless run printed a line to stdout", "type": "scripted"}
+  ]
+}

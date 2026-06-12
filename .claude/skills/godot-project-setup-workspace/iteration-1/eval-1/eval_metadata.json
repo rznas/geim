@@ -1,0 +1,10 @@
+{
+  "eval_id": 1,
+  "eval_name": "fix-nuget-sdk-error",
+  "prompt": "Project won't build: 'Unable to find package Godot.NET.Sdk'. Must work offline. Fix it.",
+  "assertions": [
+    {"text": "nuget.config GodotBundled source points at a real existing path ending in GodotSharp/Tools/nupkgs", "type": "scripted"},
+    {"text": "RESULT.md reports 'Build succeeded' under an isolated nuget cache (offline-robust)", "type": "scripted"},
+    {"text": "The .csproj TargetFramework was left at net8.0 (fix scoped to nuget.config, project not needlessly retargeted)", "type": "scripted"}
+  ]
+}

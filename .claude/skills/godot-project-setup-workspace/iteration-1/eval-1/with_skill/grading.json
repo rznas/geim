@@ -1,0 +1,23 @@
+{
+  "eval_id": 1,
+  "arm": "with_skill",
+  "passed": 3,
+  "total": 3,
+  "expectations": [
+    {
+      "text": "nuget.config GodotBundled points at a real existing nupkgs dir",
+      "passed": true,
+      "evidence": "path=/home/reza/apps/Godot_v4.6.3-stable_mono_linux_x86_64/GodotSharp/Tools/nupkgs exists=True"
+    },
+    {
+      "text": "RESULT.md reports 'Build succeeded' (offline/isolated cache)",
+      "passed": true,
+      "evidence": "# Eval Result: Fix offline Godot C# build (`Godot.NET.Sdk` not found)\n\n## What was wrong\n\n`dotnet build` failed with `Unable to find package Godot.NET.Sdk` beca"
+    },
+    {
+      "text": "csproj left at net8.0 (fix scoped to nuget, not retargeted)",
+      "passed": true,
+      "evidence": "TargetFramework=net8.0"
+    }
+  ]
+}

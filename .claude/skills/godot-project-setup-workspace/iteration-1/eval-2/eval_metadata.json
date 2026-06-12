@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "headless-run-no-main-scene",
+  "prompt": "Project builds but headless run says 'no main scene defined'. Want to run Main.tscn and see GD.Print output.",
+  "assertions": [
+    {"text": "run/main_scene=res://scenes/Main.tscn is present in project.godot", "type": "scripted"},
+    {"text": "run/main_scene sits under the [application] section header", "type": "scripted"},
+    {"text": "RESULT.md quotes the printed stdout line 'MAIN SCENE RUNNING'", "type": "scripted"}
+  ]
+}

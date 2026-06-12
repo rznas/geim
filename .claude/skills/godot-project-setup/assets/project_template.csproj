@@ -1,0 +1,15 @@
+<Project Sdk="Godot.NET.Sdk/4.6.3">
+  <!-- Set the SDK version above to match `scripts/godot.sh --version`. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+    <RootNamespace>YourProjectName</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Example NuGet dependency. Godot downloads it on next build.
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  -->
+</Project>

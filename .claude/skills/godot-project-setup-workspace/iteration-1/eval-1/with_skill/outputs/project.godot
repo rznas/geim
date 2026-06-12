@@ -1,0 +1,10 @@
+config_version=5
+
+[application]
+
+config/name="BrokenGame"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+
+[dotnet]
+
+project/assembly_name="BrokenGame"

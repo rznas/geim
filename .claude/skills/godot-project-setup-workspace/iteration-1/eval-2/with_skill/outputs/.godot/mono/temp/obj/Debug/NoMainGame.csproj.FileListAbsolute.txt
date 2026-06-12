@@ -1,0 +1,17 @@
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/NoMainGame.deps.json
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/NoMainGame.runtimeconfig.json
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/NoMainGame.dll
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/NoMainGame.pdb
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/GodotSharp.dll
+/tmp/eval-nomain/.godot/mono/temp/bin/Debug/GodotSharpEditor.dll
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.csproj.AssemblyReference.cache
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.GeneratedMSBuildEditorConfig.editorconfig
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.AssemblyInfoInputs.cache
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.AssemblyInfo.cs
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.csproj.CoreCompileInputs.cache
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.csproj.Up2Date
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.dll
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/refint/NoMainGame.dll
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.pdb
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/NoMainGame.genruntimeconfig.cache
+/tmp/eval-nomain/.godot/mono/temp/obj/Debug/ref/NoMainGame.dll

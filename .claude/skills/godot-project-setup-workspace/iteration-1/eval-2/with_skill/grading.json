@@ -1,0 +1,23 @@
+{
+  "eval_id": 2,
+  "arm": "with_skill",
+  "passed": 3,
+  "total": 3,
+  "expectations": [
+    {
+      "text": "run/main_scene=res://scenes/Main.tscn present in project.godot",
+      "passed": true,
+      "evidence": "config_version=5\n\n[application]\n\nconfig/name=\"NoMainGame\"\nconfig/features=PackedStringArray(\"4.6\", \"C#\", \"Forward Plus\")\nrun/main_scene=\"res://scenes/Main.tscn\"\n\n[dotnet]\n\nproject/assembly_name=\"NoMai"
+    },
+    {
+      "text": "run/main_scene sits under [application]",
+      "passed": true,
+      "evidence": "found under section: application"
+    },
+    {
+      "text": "RESULT.md quotes printed line 'MAIN SCENE RUNNING'",
+      "passed": true,
+      "evidence": "# Result \u2014 eval-nomain (\"no main scene defined\")\n\n## Diagnosis\n\nThe project built fine but had **no `run/main_scene` key** in `project.godot`.\nGodot's `[applica"
+    }
+  ]
+}

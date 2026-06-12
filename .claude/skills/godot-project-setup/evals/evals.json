@@ -1,0 +1,29 @@
+{
+  "skill_name": "godot-project-setup",
+  "evals": [
+    {
+      "id": 0,
+      "name": "new-project-from-scratch",
+      "prompt": "I want to start a new Godot game in C#. Set up a fresh project called StarForge at /tmp/eval-starforge using Godot, and prove it actually builds and runs — I should see something print when it runs. The Godot mono editor is at /home/reza/apps/Godot_v4.6.3-stable_mono_linux_x86_64/Godot_v4.6.3-stable_mono_linux.x86_64.",
+      "expected_output": "A buildable Godot 4.6 C# project at /tmp/eval-starforge: project.godot with the C# feature flag and [dotnet] section, a <Name>.csproj using Godot.NET.Sdk, a nuget.config pointing at the bundled feed, a minimal Node script + .tscn wired as main_scene. dotnet build succeeds and a headless run prints to stdout.",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "fix-nuget-sdk-error",
+      "prompt": "My Godot C# project at /tmp/eval-broken won't build. dotnet build dies with 'Unable to find package Godot.NET.Sdk'. I'm offline a lot so I need it to not depend on the internet. Godot mono is at /home/reza/apps/Godot_v4.6.3-stable_mono_linux_x86_64/Godot_v4.6.3-stable_mono_linux.x86_64. Fix it.",
+      "expected_output": "Diagnoses the missing/incorrect nuget.config, adds a nuget.config pointing at <godotdir>/GodotSharp/Tools/nupkgs as a package source so the SDK resolves offline, ensures the csproj SDK version matches a bundled nupkg, and verifies dotnet build now succeeds.",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "headless-run-no-main-scene",
+      "prompt": "I have a Godot C# project at /tmp/eval-nomain that builds fine but when I run it headless it says 'no main scene defined in the project'. I just want to run my Main.tscn scene and see my GD.Print output. Godot mono: /home/reza/apps/Godot_v4.6.3-stable_mono_linux_x86_64/Godot_v4.6.3-stable_mono_linux.x86_64",
+      "expected_output": "Sets run/main_scene under the [application] section of project.godot (not appended under [dotnet]), then runs headless with --quit-after to fire _Ready and confirms the print appears in stdout.",
+      "assertions": [],
+      "files": []
+    }
+  ]
+}
