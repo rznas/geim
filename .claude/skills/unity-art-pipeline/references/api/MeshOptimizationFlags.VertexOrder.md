@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/MeshOptimizationFlags.VertexOrder.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Optimize the order of vertices in the mesh to make better use of the GPUs internal caches to improve rendering performance.

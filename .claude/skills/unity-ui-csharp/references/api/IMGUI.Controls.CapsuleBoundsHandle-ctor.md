@@ -1,0 +1,13 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/IMGUI.Controls.CapsuleBoundsHandle-ctor.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| controlIDHint | An integer value used to generate consistent control IDs for each control handle on this instance. Avoid using the same value for all of your CapsuleBoundsHandle instances. |
+
+### Description
+
+Create a new instance of the CapsuleBoundsHandle class.

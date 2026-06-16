@@ -1,0 +1,16 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/LowLevelPhysics2D.PhysicsShape.ContactManifold.ManifoldPointArray.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Fixed-sized manifold point array.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| contactInfo0 | Manifold Point #0. |
+| contactInfo1 | Manifold Point #1. |
+| speculativePointCount | The number of manifold points available that are speculative, in the range [0, 2]. |
+| this[int] | Indexer to access the manifold points in the array. |

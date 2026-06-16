@@ -1,0 +1,14 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/ShadowProjection.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Shadow projection type for Quality Settings.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| CloseFit | Close fit shadow maps with linear fadeout. |
+| StableFit | Stable shadow maps with spherical fadeout. |

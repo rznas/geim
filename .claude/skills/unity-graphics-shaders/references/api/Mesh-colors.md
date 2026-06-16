@@ -1,0 +1,26 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Mesh-colors.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Vertex colors of the Mesh.
+
+If no vertex colors are available, an empty array will be returned.
+
+```csharp
+// Sets the vertex color to be red at the y=0 and green at y=1.
+// (Note that most built-in Shaders don't display vertex colors. Use one that does, such as a Particle Shader, to see vertex colors)using UnityEngine;public class ExampleClass : MonoBehaviour
+{
+    void Start()
+    {
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
+        Vector3[] vertices = mesh.vertices;        // create new colors array where the colors will be created.
+        Color[] colors = new Color[vertices.Length];        for (int i = 0; i < vertices.Length; i++)
+            colors[i] = Color.Lerp(Color.red, Color.green, vertices[i].y);        // assign the array of colors to the Mesh.
+        mesh.colors = colors;
+    }
+}
+```
+
+For performance reasons, consider using colors32 instead. This will avoid byte-to-float conversions in colors, and use less temporary memory.

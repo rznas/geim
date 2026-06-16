@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/AudioSource-velocityUpdateMode.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Whether the Audio Source should be updated in the fixed or dynamic update.
+
+Make sure this is set to update in the same update loop as the Audio Source is moved in if you are experiencing problems with Doppler effect simulation for this source. The default setting will automatically set the source to be updated in the fixed update loop if it is attached to a rigidbody, and dynamic otherwise.

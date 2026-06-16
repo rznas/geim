@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Search.SearchProvider-type.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+The search provider type can be another search provider id that provider is based on. This is used when we have multiple groups in the search view that list results from a similar provider.

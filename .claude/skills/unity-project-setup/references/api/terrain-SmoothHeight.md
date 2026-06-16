@@ -1,0 +1,36 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/terrain-SmoothHeight.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Smooth the terrain’s height
+
+The Smooth Height tool averages out nearby areas, which softens the landscape and reduces abrupt changes. Use the tool:
+
+- After you paint with brushes that introduce sharp, jagged edges into a landscape.
+- To create smooth transitions between **Terrain** tiles that start at different heights (refer to Set the height of an area or tile).
+
+## Access the tool
+
+To smooth the height, in the Terrain tile’s **Inspector** window, select the **Paint Terrain** tool > tool dropdown > **Smooth Height**.
+
+## Tool options
+
+The Smooth Height tool is brush-based. To learn about working with brushes, refer to Brushes.
+
+## Smooth Controls
+
+| **Property** | **Function** |
+| --- | --- |
+| **Blur Direction** (built-in Terrain system) or **Verticality** (Terrain Tools package) | The direction in which to smooth the height. If the value is negative, the tool smooths down the highest points. If the value is positive, the tool pulls lower points up towards higher points. If the value is `0`, the tool smooths high and low points toward their common denominator. |
+| **Blur Radius** (only in the Terrain Tools package) | The sample size on which to base the average height for the smooth operation. The higher the value, the greater the tool’s impact. The minimum value is `1`. The maximum value is half of the **heightmap**’s resolution (refer to Terrain Settings reference). The Blur Radius doesn’t change how much of the terrain is painted; to control the painted area size, use the **Brush Size** property. |
+
+The **Brush Size** value determines the size of the Brush to use, and the **Opacity** value determines how quickly the tool smooths out the area you’re painting.
+
+## Additional resources
+
+- Work with heightmaps
+- Primary sculpting tools
+- Advanced sculpting tools
+- Change existing height with effects
+- Transform terrain features
+- Erode the terrain

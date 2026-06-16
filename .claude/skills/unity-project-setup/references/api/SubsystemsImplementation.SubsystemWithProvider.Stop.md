@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/SubsystemsImplementation.SubsystemWithProvider.Stop.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Stops an instance of a subsystem.
+
+Once the instance is stopped, the subsystem representing this instance is no longer active and should not consume CPU resources.

@@ -1,0 +1,22 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Rendering.CommandBuffer.SetComputeIntParams.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| computeShader | ComputeShader to set parameter for. |
+| name | Name of the variable in shader code. |
+| nameID | Property name ID. Use Shader.PropertyToID to get this ID. |
+| values | Values to set. |
+
+### Description
+
+Adds a command to set multiple consecutive integer parameters on a ComputeShader.
+
+This function can be used to set an integer vector, integer array or integer vector array values. For example, `int4 myArray[2]` in the compute shader can be filled by passing 8 integers. See Compute Shaders for information on data layout rules.
+
+Constant buffers are shared between all kernels in a single compute shader asset. Therefore this function affects all kernels in the passed ComputeShader.
+
+Additional resources: DispatchCompute, SetComputeFloatParam, SetComputeFloatParams, SetComputeIntParam, SetComputeMatrixParam, SetComputeMatrixArrayParam, SetComputeVectorParam, SetComputeVectorArrayParam, SetComputeTextureParam, SetComputeBufferParam.

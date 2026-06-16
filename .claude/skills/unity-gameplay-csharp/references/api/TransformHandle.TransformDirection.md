@@ -1,0 +1,31 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/TransformHandle.TransformDirection.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Transforms `direction` from local space to world space.
+
+This operation is not affected by scale or position of the transform. The returned vector has the same length as `direction`.
+
+If you need the inverse operation to transform from world space to local space you can use TransformHandle.InverseTransformDirection
+
+You should use TransformHandle.TransformPoint for the conversion if the vector represents a position rather than a direction.
+
+If you need to transform many directions at once consider using TransformHandle.TransformDirections instead as it is much faster than repeatedly calling this function.
+
+Additional resources: TransformHandle.TransformDirections, TransformHandle.InverseTransformDirection, TransformHandle.TransformPoint, TransformHandle.TransformVector.
+
+### Description
+
+Transforms direction `x`, `y`, `z` from local space to world space.
+
+This operation is not affected by scale or position of the transform. The returned vector has the same length as `direction`.
+
+If you need the inverse operation to transform from world space to local space you can use TransformHandle.InverseTransformDirection
+
+You should use TransformHandle.TransformPoint for the conversion if the vector represents a position rather than a direction.
+
+If you need to transform many directions at once consider using TransformHandle.TransformDirections instead as it is much faster than repeatedly calling this function.
+
+Additional resources: TransformHandle.TransformDirections, TransformHandle.InverseTransformDirection, TransformHandle.TransformPoint, TransformHandle.TransformVector.

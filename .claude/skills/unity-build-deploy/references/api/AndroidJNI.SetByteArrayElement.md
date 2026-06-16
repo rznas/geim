@@ -1,0 +1,13 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/AndroidJNI.SetByteArrayElement.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Sets the sbyte value of one element in a primitive array.
+
+This function is a special case of SetByteArrayRegion(), called with region size set to 1.
+
+AndroidJNI.SetByteArrayElement is obsolete. Use AndroidJNI.SetSByteArrayElement instead.
+
+Additional resources: Java Native Interface Specification (Oracle)

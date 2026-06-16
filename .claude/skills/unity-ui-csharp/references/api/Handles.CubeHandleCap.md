@@ -1,0 +1,70 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Handles.CubeHandleCap.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| controlID | The control ID for the handle. |
+| position | The position of the handle in the space of Handles.matrix. |
+| rotation | The rotation of the handle in the space of Handles.matrix. |
+| size | The size of the handle in the space of Handles.matrix. Use HandleUtility.GetHandleSize if you want a constant screen-space size. |
+| eventType | Event type for the handle to act upon. By design it handles EventType.Layout and EventType.Repaint events. |
+
+### Description
+
+Draw a cube handle. Pass this into handle functions.
+
+On EventType.Layout event, calculates handle distance to mouse and calls HandleUtility.AddControl accordingly.
+
+On EventType.Repaint event, draws the handle shape.
+
+ *Cube Handle Cap in the Scene View.*
+
+Add the following script to your Assets folder as CubeExample.cs and add the CubeExample component to an object in the Scene.
+
+```csharp
+using UnityEngine;public class CubeExample : MonoBehaviour {}
+```
+
+Add the following script to Assets/Editor as CubeExampleEditor.cs and select the object with the CubeExample component.
+
+```csharp
+using UnityEditor;
+using UnityEngine;[CustomEditor(typeof(CubeExample))]
+public class CubeExampleEditor : Editor
+{
+    float size = 1f;    protected virtual void OnSceneGUI()
+    {
+        if (Event.current.type == EventType.Repaint)
+        {
+            Transform transform = ((CubeExample)target).transform;
+            Handles.color = Handles.xAxisColor;
+            Handles.CubeHandleCap(
+                0,
+                transform.position + new Vector3(3f, 0f, 0f),
+                transform.rotation * Quaternion.LookRotation(Vector3.right),
+                size,
+                EventType.Repaint
+            );
+            Handles.color = Handles.yAxisColor;
+            Handles.CubeHandleCap(
+                0,
+                transform.position + new Vector3(0f, 3f, 0f),
+                transform.rotation * Quaternion.LookRotation(Vector3.up),
+                size,
+                EventType.Repaint
+            );
+            Handles.color = Handles.zAxisColor;
+            Handles.CubeHandleCap(
+                0,
+                transform.position + new Vector3(0f, 0f, 3f),
+                transform.rotation * Quaternion.LookRotation(Vector3.forward),
+                size,
+                EventType.Repaint
+            );
+        }
+    }
+}
+```

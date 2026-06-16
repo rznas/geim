@@ -1,0 +1,16 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/TextureImporterMipFilter.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Mip map filter for TextureImporter.
+
+Additional resources: TextureImporter.mipmapFilter.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| BoxFilter | Box mipmap filter. |
+| KaiserFilter | Kaiser mipmap filter. |

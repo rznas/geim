@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/SceneView-selectedOutlineColor.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Gets the Color of selected outline.
+
+This color can only be set through the Editor. To change this in the Editor, go to Preferences > Colors > Selected Outline.

@@ -1,0 +1,13 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Vector2.Dot.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Dot Product of two vectors.
+
+Returns `lhs` `.` `rhs`.
+
+For normalized vectors Dot returns 1 if they point in exactly the same direction; -1 if they point in completely opposite directions; and a number in between for other cases (e.g. Dot returns zero if vectors are perpendicular).
+
+For vectors of arbitrary length the Dot return values are similar: they get larger when the angle between vectors decreases.

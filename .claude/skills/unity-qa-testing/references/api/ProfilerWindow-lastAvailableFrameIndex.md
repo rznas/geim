@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/ProfilerWindow-lastAvailableFrameIndex.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+The index of the last frame available in the Profiler Window, or -1 if no frames are available.

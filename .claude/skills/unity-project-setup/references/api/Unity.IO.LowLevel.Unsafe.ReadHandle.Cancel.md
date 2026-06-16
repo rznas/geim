@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Unity.IO.LowLevel.Unsafe.ReadHandle.Cancel.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Cancels the AsyncReadManager.Read operation on this handle.
+
+If the read operation has already begun, the operation still completes. Only operations waiting in the queue can be canceled.

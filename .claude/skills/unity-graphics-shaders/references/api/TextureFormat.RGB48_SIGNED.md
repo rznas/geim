@@ -1,0 +1,13 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/TextureFormat.RGB48_SIGNED.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Three color (RGB) texture format, 16-bits signed integer per channel.
+
+Import textures of this format in .DDS files.
+
+Note that not all graphics cards support all texture formats, use SystemInfo.SupportsTextureFormat to check.
+
+Additional resources: Texture2D.format, texture assets.

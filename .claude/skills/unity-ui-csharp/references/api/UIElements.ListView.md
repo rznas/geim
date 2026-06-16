@@ -1,0 +1,341 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/UIElements.ListView.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+A ListView is a vertically scrollable area that links to, and displays, a list of items.
+
+A ListView is a ScrollView with additional logic to display a list of vertically-arranged VisualElements. Each VisualElement in the list is bound to a corresponding element in a data-source list. The data-source list can contain elements of any type.
+
+ The logic required to create VisualElements, and to bind them to or unbind them from the data source, varies depending on the intended result. For the ListView to function correctly, you must supply at least a value for itemsSource.
+
+ It's also recommended to supply the following properties for more complex items:
+ - makeItem 
+ - bindItem 
+ - unbindItem 
+ - destroyItem 
+ - fixedItemHeight when using CollectionVirtualizationMethod.FixedHeight
+
+
+ The `ListView` creates multiple VisualElement objects for the visible items. As the user scrolls, the ListView recycles these objects and re-binds them to new data items.
+
+ To set the height of a single item in pixels, set the `item-height` property in UXML or the ListView.itemHeight property in C# to the desired value. 
+ 
+ To display a border around the scrollable area, set the `show-border` property in UXML or the ListView.showBorder property in C# to `true`.
+ 
+ By default, the user can select one element in the list at a time. To change the default selection use the `selection-type` property in UXML or theListView.selectionType property in C#. To allow the user to select more than one element simultaneously, set the property to `Selection.Multiple`. To prevent the user from selecting items, set the property to `Selection.None`.
+ 
+ By default, all rows in the ListView have same background color. To make the row background colors alternate, set the `show-alternating-row-backgrounds` property in UXML or the ListView.showAlternatingRowBackgrounds property in C# to AlternatingRowBackground.ContentOnly or AlternatingRowBackground.All. For details, see AlternatingRowBackground. 
+ 
+ By default, the user can't reorder the list's elements. To allow the user to drag the elements to reorder them, set the `reorderable` property in UXML or the ListView.reorderable property in C# to `true`.
+ 
+ To make the first item in the ListView display the number of items in the list, set the `show-bound-collection-size` property in UXML or the ListView.showBoundCollectionSize to true. This is useful for debugging. By default, the ListView's scroller element only scrolls vertically.
+ 
+ To enable horizontal scrolling when the displayed element is wider than the visible area, set the `horizontal-scrolling-enabled` property in UXML or the ListView.horizontalScrollingEnabled to `true`.
+
+ For more information, refer to ListView. 
+
+ For the difference between IDs and indices, refer to BaseVerticalCollectionView. 
+
+The following example creates an editor window with a list view of a thousand items.
+
+```csharp
+using System;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;public class ListViewExampleWindow : EditorWindow
+{
+    [MenuItem("Window/ListViewExampleWindow")]
+    public static void OpenDemoManual()
+    {
+        GetWindow<ListViewExampleWindow>().Show();
+    }    public void OnEnable()
+    {
+        // Create a list of data. In this case, numbers from 1 to 1000.
+        const int itemCount = 1000;
+        var items = new List<string>(itemCount);
+        for (int i = 0; i <= itemCount - 1; i++)
+            items.Add(i.ToString());        // The "makeItem" function is called when the
+        // ListView needs more items to render.
+        Func<VisualElement> makeItem = () => new Label();        // As the user scrolls through the list, the ListView object
+        // recycles elements created by the "makeItem" function,
+        // and invoke the "bindItem" callback to associate
+        // the element with the matching data item (specified as an index in the list).
+        Action<VisualElement, int> bindItem = (e, i) => (e as Label).text = items[i];        // Provide the list view with an explicit height for every row
+        // so it can calculate how many items to actually display
+        const int itemHeight = 16;        var listView = new ListView(items, itemHeight, makeItem, bindItem)
+        {
+            // Enables multiple selection using shift or ctrl/cmd keys.
+            selectionType = SelectionType.Multiple
+        };        // Set up list view so that you can add or remove items dynamically.
+        listView.showAddRemoveFooter = true;        // Implement functionality on the list view to add or remove items.
+        // Note: The "onAdd" and "onRemove" callbacks are optional and you should only use them to override the default logic.
+        listView.onAdd = view =>
+        {
+            var itemsSourceCount = view.itemsSource.Count;
+            view.itemsSource.Add(itemsSourceCount.ToString());
+            view.RefreshItems();
+            view.ScrollToItem(itemsSourceCount);
+        };
+        listView.onRemove = view =>
+        {
+            var itemsSourceCount = view.itemsSource.Count;
+            view.itemsSource.RemoveAt(itemsSourceCount - 1);
+            view.RefreshItems();
+            view.ScrollToItem(itemsSourceCount - 2);
+        };        // Single click triggers "selectionChanged" with the selected items. (f.k.a. "onSelectionChange")
+        // Use "selectedIndicesChanged" to get the indices of the selected items instead. (f.k.a. "onSelectedIndicesChange")
+        listView.selectionChanged += objects => Debug.Log($"Selected: {string.Join(", ", objects)}");        // Double-click triggers "itemsChosen" with the selected items. (f.k.a. "onItemsChosen")
+        listView.itemsChosen += objects => Debug.Log($"Double-clicked: {string.Join(", ", objects)}");        listView.style.flexGrow = 1.0f;        rootVisualElement.Add(listView);        // Allow to add items, but only when there is no override, by using a Toggle.
+        listView.allowAdd = true;
+        var toggle = new Toggle("Override Add functionality")
+        {
+            value = listView.overridingAddButtonBehavior != null,
+            style = {alignSelf = Align.Auto},
+        };
+        toggle.RegisterValueChangedCallback(evt => listView.overridingAddButtonBehavior = evt.newValue
+            ? (view, button) =>
+            {
+                Debug.Log("You cannot add new items at this time");
+            }
+            : null
+        );
+        rootVisualElement.Add(toggle);
+    }
+}
+```
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| bindItem | Callback for binding a data item to the visual element. |
+| destroyItem | Callback invoked when a VisualElement created via makeItem is no longer needed and will be destroyed. |
+| itemTemplate | A UXML template that constructs each recycled and rebound element within the list. This template is designed to replace the makeItem definition. |
+| makeItem | Callback for constructing the VisualElement that is the template for each recycled and re-bound element in the list. |
+| unbindItem | Callback for unbinding a data item from the VisualElement. |
+
+### Constructors
+
+| Constructor | Description |
+| --- | --- |
+| ListView | Creates a ListView with all default properties. The ListView.itemsSource must all be set for the ListView to function properly. |
+
+### Inherited Members
+
+### Static Properties
+
+| Property | Description |
+| --- | --- |
+| arraySizeFieldUssClassName | The USS class name for the size field of the ListView when show bound collection size is enabled |
+| arraySizeFieldWithFooterUssClassName | The USS class name for the size field of the ListView when the footer is enabled. |
+| arraySizeFieldWithHeaderUssClassName | The USS class name for the size field of the ListView when foldout header is enabled. |
+| emptyLabelUssClassName | The USS class name for label displayed when ListView is empty. |
+| foldoutHeaderUssClassName | The USS class name for the foldout header of the ListView. |
+| footerAddButtonName | The name of the add button element in the footer. |
+| footerRemoveButtonName | The name of the remove button element in the footer. |
+| footerUssClassName | The USS class name for the footer of the ListView. |
+| itemUssClassName | The USS class name of item elements in ListView elements. |
+| listViewWithFooterUssClassName | The USS class name for ListView when add/remove footer is enabled. |
+| listViewWithHeaderUssClassName | The USS class name for ListView when foldout header is enabled. |
+| overMaxMultiEditLimitClassName | The USS class name for label displayed when ListView is trying to edit too many items. |
+| reorderableItemContainerUssClassName | The USS class name for item container in reorderable animated ListView. |
+| reorderableItemHandleBarUssClassName | The USS class name for drag handle bar in reorderable animated ListView. |
+| reorderableItemHandleUssClassName | The USS class name for drag handle in reorderable animated ListView. |
+| reorderableItemUssClassName | The USS class name for item elements in reorderable animated ListView. |
+| reorderableUssClassName | The USS class name for reorderable animated ListView elements. |
+| scrollViewWithFooterUssClassName | The USS class name for scroll view when add/remove footer is enabled. |
+| ussClassName | The USS class name for ListView elements. |
+| borderUssClassName | The USS class name for BaseVerticalCollectionView elements with a border. |
+| dragHoverBarUssClassName | The USS class name of the drag hover bar. |
+| dragHoverMarkerUssClassName | The USS class name of the drag hover circular marker used to indicate depth. |
+| itemAlternativeBackgroundUssClassName | The USS class name for odd rows in the BaseVerticalCollectionView. |
+| itemDragHoverUssClassName | The USS class name applied to an item element on drag hover. |
+| itemSelectedVariantUssClassName | The USS class name of selected item elements in the BaseVerticalCollectionView. |
+| listScrollViewUssClassName | The USS class name of the scroll view in the BaseVerticalCollectionView. |
+| disabledUssClassName | USS class name of local disabled elements. |
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| allowAdd | This property allows the user to allow or block the addition of an item when clicking on the Add Button. It must return true or false. |
+| allowRemove | This property allows the user to allow or block the removal of an item when clicking on the Remove Button. It must return true or false. |
+| bindingSourceSelectionMode | This property controls whether every element in the list will get its data source setup automatically to the correct item in the collection's source. |
+| headerTitle | This property controls the text of the foldout header when using showFoldoutHeader. |
+| makeFooter | This callback allows the user to make their own footer for this control. |
+| makeHeader | This callback allows the user to make their own header for this control. |
+| makeNoneElement | This callback allows the user to set a Visual Element to replace the "List is empty" Label shown when the ListView is empty. |
+| onAdd | This callback allows the user to implement their own code to be executed when the Add Button is clicked. |
+| onRemove | This callback allows the user to implement their own code to be executed when the Remove Button is clicked. |
+| overridingAddButtonBehavior | This callback allows the user to implement a DropdownMenu when the Add Button is clicked. |
+| reorderMode | This property controls the drag and drop mode for the list view. |
+| showAddRemoveFooter | This property controls whether a footer will be added to the list view. |
+| showBoundCollectionSize | This property controls whether the list view displays the collection size (number of items). |
+| showFoldoutHeader | This property controls whether the list view displays a header, in the form of a foldout that can be expanded or collapsed. |
+| viewController | The view controller for this view, cast as a BaseListViewController. |
+| contentContainer | Returns the content container for the BaseVerticalCollectionView. Because the BaseVerticalCollectionView control automatically manages its content, this always returns null. |
+| fixedItemHeight | The height of a single item in the list, in pixels. |
+| horizontalScrollingEnabled | This property controls whether the collection view shows a horizontal scroll bar when its content does not fit in the visible area. |
+| itemsSource | The data source for collection items. |
+| reorderable | Gets or sets a value that indicates whether the user can drag list items to reorder them. |
+| selectedIds | Returns the persistent IDs of selected items in the data source, regardless of whether they are collapsed or not. Always returns an enumerable, even if no item is selected, or a single item is selected. |
+| selectedIndex | Returns or sets the selected item's index in the data source. If multiple items are selected, returns the first selected item's index. If multiple items are provided, sets them all as selected. If no item is selected, returns -1. |
+| selectedIndices | Returns the indices of selected items in the data source. Always returns an enumerable, even if no item is selected, or a single item is selected. |
+| selectedItem | Returns the selected item from the data source. If multiple items are selected, returns the first selected item. |
+| selectedItems | Returns the selected items from the data source. Always returns an enumerable, even if no item is selected, or a single item is selected. |
+| selectionType | Controls the selection type. |
+| showAlternatingRowBackgrounds | This property controls whether the background colors of collection view rows alternate. Takes a value from the AlternatingRowBackground enum. |
+| showBorder | Enable this property to display a border around the collection view. |
+| virtualizationMethod | The virtualization method to use for this collection when a scroll bar is visible. Takes a value from the CollectionVirtualizationMethod enum. |
+| binding | Binding object that will be updated. |
+| bindingPath | Path of the target property to be bound. |
+| canGrabFocus | Whether the element can be focused. |
+| delegatesFocus | Whether the element delegates the focus to its children. |
+| focusable | Whether an element can potentially receive focus. |
+| focusController | Returns the focus controller for this element. |
+| tabIndex | An integer used to sort focusable elements in the focus ring. Must be greater than or equal to zero. |
+| childCount | Number of child elements in this object's contentContainer. |
+| contentRect | The rectangle of the content area of the element, in the local space of the element. (Read Only) |
+| customStyle | The custom style properties accessor of a VisualElement (Read Only). |
+| dataSource | Assigns a data source to this VisualElement which overrides any inherited data source. This data source is inherited by all children. |
+| dataSourcePath | Path from the data source to the value. |
+| dataSourceType | The possible type of data source assignable to this VisualElement. This information is only used by the UI Builder as a hint to provide some completion to the data source path field when the effective data source cannot be specified at design time. |
+| disablePlayModeTint | Play-mode tint is applied by default unless this is set to true. It's applied hierarchically to this VisualElement and to all its children that exist on an editor panel. |
+| enabledInHierarchy | Returns true if the VisualElement is enabled in its own hierarchy. |
+| enabledSelf | Returns true if the VisualElement is enabled locally. |
+| experimental | Returns the UIElements experimental interfaces. |
+| generateVisualContent | Delegate function to generate the visual content of a visual element. |
+| hasActivePseudoState | Returns true if this element matches the :active pseudo-class. |
+| hasCheckedPseudoState | Returns true if this element matches the :checked pseudo-class. |
+| hasDisabledPseudoState | Returns true if this element matches the :disabled pseudo-class. |
+| hasEnabledPseudoState | Returns true if this element matches the :enabled pseudo-class. |
+| hasFocusPseudoState | Returns true if this element matches the :focus pseudo-class. |
+| hasHoverPseudoState | Returns true if this element matches the :hover pseudo-class. |
+| hasInactivePseudoState | Returns true if this element matches the :inactive pseudo-class. |
+| hasRootPseudoState | Returns true if this element matches the :root pseudo-class. |
+| hierarchy | Access to this element physical hierarchy |
+| languageDirection | Indicates the directionality of the element's text. The value will propagate to the element's children. |
+| layout | The position and size of the VisualElement relative to its parent, as computed by the layout system. (Read Only) |
+| localBound | Returns a Rect representing the Axis-aligned Bounding Box (AABB) after applying the transform, but before applying the layout translation. |
+| name | The name of this VisualElement. |
+| paddingRect | The rectangle of the padding area of the element, in the local space of the element. |
+| panel | The panel onto which this VisualElement is attached. |
+| parent | The parent of this VisualElement. |
+| pickingMode | Determines if this element can be the target of pointer events or picked by IPanel.Pick queries. |
+| resolvedStyle | The final rendered style values of a visual element, as it's rendered in the current frame.(Read Only) |
+| scaledPixelsPerPoint | Return the resulting scaling from the panel that considers the screen DPI and the customizable scaling factor, but not the transform scale of the element and its ancestors. See Panel.scaledPixelsPerPoint. This should only be called on elements that are part of a panel. |
+| schedule | Retrieves the IVisualElementScheduler associated to this VisualElement. Use it to enqueue actions. |
+| style | Sets the style values on a VisualElement. |
+| styleSheets | Returns a VisualElementStyleSheetSet that manipulates style sheets attached to this element. |
+| this[int] | Retrieves the child element at a specific index. |
+| tooltip | Text to display inside an information box after the user hovers the element for a small amount of time. This is only supported in the Editor UI. |
+| usageHints | A combination of hint values that specify high-level intended usage patterns for the VisualElement. This property can only be set when the VisualElement is not yet part of a Panel. Once part of a Panel, this property becomes effectively read-only, and attempts to change it will throw an exception. The specification of proper UsageHints drives the system to make better decisions on how to process or accelerate certain operations based on the anticipated usage pattern. Note that those hints do not affect behavioral or visual results, but only affect the overall performance of the panel and the elements within. It's advised to always consider specifying the proper UsageHints, but keep in mind that some UsageHints might be internally ignored under certain conditions (e.g. due to hardware limitations on the target platform). |
+| userData | This property can be used to associate application-specific user data with this VisualElement. |
+| viewDataKey | Used for view data persistence, such as tree expanded states, scroll position, or zoom level. |
+| visible | Indicates whether or not this element should be rendered. |
+| visualTreeAssetSource | Stores the asset reference, if the generated element is cloned from a VisualTreeAsset. |
+| worldBound | Returns the axis-aligned bounding box of the element in panel coordinates after the cumulative transform from the IPanel root. |
+| worldTransform | Returns a matrix that cumulates the following transformations (in order): Local scalingLocal rotationLocal translationLayout translationParent worldTransform (recursive definition - consider the identity matrix when there's no parent) |
+
+### Public Methods
+
+| Method | Description |
+| --- | --- |
+| SetViewController | Assigns the view controller for this view and registers all events required for it to function properly. |
+| AddToSelection | Adds an item to the collection of selected items. |
+| ClearSelection | Deselects any selected items. |
+| GetRootElementForId | Gets the root element of the specified collection view item. |
+| GetRootElementForIndex | Gets the root element of the specified collection view item. |
+| Rebuild | Clears the collection view, recreates all visible visual elements, and rebinds all items. |
+| RefreshItem | Rebinds a single item if it is currently visible in the collection view. |
+| RefreshItems | Rebinds all items currently visible. |
+| RemoveFromSelection | Removes an item from the collection of selected items. |
+| ScrollTo | Scrolls to a specific VisualElement. |
+| ScrollToItem | Scrolls to a specific item index and makes it visible. |
+| ScrollToItemById | Scrolls to a specific item id and makes it visible. |
+| SetSelection | Sets the currently selected item. |
+| SetSelectionWithoutNotify | Sets a collection of selected items without triggering a selection change callback. |
+| HasBubbleUpHandlers | Return true if event handlers for the event propagation BubbleUp phase have been attached to this object. |
+| HasTrickleDownHandlers | Returns true if event handlers, for the event propagation TrickleDown phase, are attached to this object. |
+| RegisterCallback | Adds an event handler to the instance. |
+| RegisterCallbackOnce | Adds an event handler to the instance. The event handler is automatically unregistered after it has been invoked exactly once. |
+| UnregisterAllRemovableCallbacks | Removes all callbacks registered with CallbackOptions.Removable from the instance. |
+| UnregisterCallback | Remove callback from the instance. |
+| Blur | Tell the element to release the focus. |
+| Focus | Attempts to give the focus to this element. |
+| Add | Adds an element to the contentContainer of this element. |
+| AddToClassList | Adds a class to the class list of the element in order to assign styles from USS. Note the class name is case-sensitive. |
+| BringToFront | Brings this element to the end of its parent children list. The element will be visually in front of any overlapping sibling elements. |
+| Children | Returns the elements from its contentContainer. |
+| ClassListContains | Searches for a class in the class list of this element. |
+| Clear | Remove all child elements from this element's contentContainer |
+| ClearBinding | Removes a binding from the element. |
+| ClearBindings | Removes all bindings from the element. |
+| ClearClassList | Removes all classes from the class list of this element. AddToClassList |
+| Contains | Checks if this element is an ancestor of the specified child element. |
+| ContainsPoint | Checks if the specified point intersects with this VisualElement's layout. |
+| ElementAt | Retrieves the child element at a specific index. |
+| EnableInClassList | Enables or disables the class with the given name. |
+| FindAncestorUserData | Searches up the hierarchy of this VisualElement and retrieves stored userData, if any is found. |
+| FindCommonAncestor | Finds the lowest common ancestor between two VisualElements inside the VisualTree hierarchy. |
+| GetBinding | Gets the binding instance for the provided targeted property. |
+| GetBindingInfos | Gets information on all the bindings of the current element. |
+| GetClasses | Retrieve the classes for this element. |
+| GetDataSourceContext | Queries the dataSource and dataSourcePath of a binding object. |
+| GetFirstAncestorOfType | Walks up the hierarchy, starting from this element's parent, and returns the first VisualElement of this type |
+| GetFirstOfType | Walks up the hierarchy, starting from this element, and returns the first VisualElement of this type |
+| GetHierarchicalDataSourceContext | Queries the dataSource and dataSourcePath inherited from the hierarchy. |
+| HasBinding | Allows to know if a target property has a binding associated to it. |
+| IndexOf | Retrieves the child index of the specified VisualElement. |
+| Insert | Insert an element into this element's contentContainer |
+| IsMarkedForRepaint | Checks if the VisualElement is marked dirty for repaint. |
+| MarkDirtyRepaint | Marks that the VisualElement requires a repaint. |
+| PlaceBehind | Places this element right before the sibling element in their parent children list. If the element and the sibling position overlap, the element will be visually behind of its sibling. |
+| PlaceInFront | Places this element right after the sibling element in their parent children list. If the element and the sibling position overlap, the element will be visually in front of its sibling. |
+| Remove | Removes this child from the hierarchy of its contentContainer. |
+| RemoveAt | Removes a child, at the provided index, from the list of children of the current element. |
+| RemoveFromClassList | Removes a class from the class list of the element. |
+| RemoveFromHierarchy | Removes this element from its parent hierarchy. |
+| SendEvent | Sends an event to the event handler. |
+| SendToBack | Sends this element to the beginning of its parent children list. The element will be visually behind any overlapping sibling elements. |
+| SetActivePseudoState | Sets whether or not this element is displayed as being active. |
+| SetBinding | Assigns a binding between a target and a source. |
+| SetCheckedPseudoState | Sets whether or not this element is displayed as being checked. |
+| SetEnabled | Changes the VisualElement enabled state. A disabled visual element does not receive most events. |
+| Sort | Reorders child elements from this VisualElement contentContainer. |
+| ToggleInClassList | Toggles between adding and removing the given class name from the class list. |
+| TryGetBinding | Gets the binding instance for the provided targeted property. |
+| TryGetDataSourceContext | Queries the dataSource and dataSourcePath of a binding object. |
+| TryGetLastBindingToSourceResult | Returns the last BindingResult of a binding object from the UI to the data source. |
+| TryGetLastBindingToUIResult | Returns the last BindingResult of a binding object from the data source to the UI. |
+
+### Protected Methods
+
+| Method | Description |
+| --- | --- |
+| CreateViewController | Creates the view controller for this view. Override this method in inheritors to change the controller type. |
+| HandleEventBubbleUp | Executes logic on this element during the BubbleUp phase, immediately before this element's BubbleUp callbacks. Calling StopPropagation will prevent further invocations of this method along the propagation path. |
+| HandleEventTrickleDown | Executes logic on this element during the TrickleDown phase, immediately after this element's TrickleDown callbacks. Calling StopPropagation will prevent further invocations of this method along the propagation path. |
+| NotifyPropertyChanged | Informs the data binding system that a property of a control has changed. |
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| itemsAdded | This event is called for every item added to the itemsSource. Includes the item index. |
+| itemsRemoved | This event is called for every item removed from the itemsSource. Includes the item index. |
+| canStartDrag | Called when a drag operation wants to start in this collection view. |
+| dragAndDropUpdate | Called when a drag operation updates in this collection view. |
+| handleDrop | Called when a drag operation is released in this collection view. |
+| itemIndexChanged | Called when an item is moved in the itemsSource. |
+| itemsChosen | Callback triggered when the user acts on a selection of one or more items, for example by double-clicking or pressing Enter. |
+| itemsSourceChanged | Raised when the data source of a vertical collection view is assigned a new reference or new type. |
+| onItemsChosen | Obsolete. Use BaseVerticalCollectionView.itemsChosen instead. |
+| onSelectedIndicesChange | Obsolete. Use BaseVerticalCollectionView.selectedIndicesChanged instead. |
+| onSelectionChange | Obsolete. Use BaseVerticalCollectionView.selectionChanged instead. |
+| selectedIndicesChanged | Callback triggered when the selection changes. |
+| selectionChanged | Callback triggered when the selection changes. |
+| setupDragAndDrop | Called when a drag operation starts in this collection view. |

@@ -1,0 +1,41 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/AssetImporters.AssetImportContext.DependsOnSourceAsset.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| path | The path of the source dependency. |
+| guid | The guid of the source asset dependency. |
+
+### Description
+
+Allows you to specify that an Asset depends directly on the source file of another Asset (as opposed to the import result of another asset).
+
+When you specify that one asset depends on another (eg, Asset A depends on Assset B), it means if that Asset B is modified, not only will Asset B be reimported, but also Asset A will be reimported.
+
+Note: This methods sets up a dependency on the Asset source file itself, not the import result (the artifact) of the Asset. If you want to set up a dependency on the import result of an asset, use DependsOnArtifact.
+
+```csharp
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.AssetImporters;
+using System.IO;[ScriptedImporter(1, "cube")]
+public class CubeWithTextureImporter : ScriptedImporter
+{
+    public override void OnImportAsset(AssetImportContext ctx)
+    {
+        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);        ctx.AddObjectToAsset("main obj", cube);
+        ctx.SetMainObject(cube);        var material = new Material(Shader.Find("Standard"));        var lines = File.ReadAllLines(ctx.assetPath);
+        var texturePath = lines[0];
+        var texture = AssetDatabase.LoadAssetAtPath<Texture>(texturePath);
+        if (texture != null)
+        {
+            material.SetTexture("_MainTex", texture);
+            // add a dependency on the texture, such that if it changes or moves, we reimport the asset
+            ctx.DependsOnSourceAsset(texturePath);
+        }        ctx.AddObjectToAsset("MaterialWithTexture", material);
+    }
+}
+```

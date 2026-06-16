@@ -1,0 +1,18 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/MaterialPropertyBlock.GetVector.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| nameID | The name ID of the property retrieved by Shader.PropertyToID. |
+| name | The name of the property. |
+
+### Description
+
+Get a vector from the property block.
+
+Returns zero vector if not found. If the value is previously set using SetColor, the returned vector value is the sRGB color value converted for the active color space.
+
+Additional resources: GetColor, SetVector, SetColor.

@@ -1,0 +1,27 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Mesh.MeshData.GetVertexAttributeOffset.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| attr | The vertex data attribute to check for. |
+
+### Returns
+
+**int** The byte offset within a stream of the data attribute, or -1 if it is not present.
+
+### Description
+
+Gets the offset within a vertex buffer stream of a given vertex data attribute on this `MeshData`.
+
+This method returns the byte offset for a specific vertex attribute (like position, normal, or color) relative to the start of an individual vertex's data within the vertex buffer stream that contains that attribute.
+
+Unity allows flexible vertex data layouts where attributes can be interleaved in a single stream (typically stream 0) or separated across multiple streams using SetVertexBufferParams. This method automatically identifies which stream the specified `attr` resides in and calculates its byte offset from the beginning of a vertex element within that particular stream.
+
+Knowing this offset is useful when you need to directly access or interpret raw vertex buffer data, for instance, when working with the MeshData API or GraphicsBuffer, as it allows you to pinpoint the start of the attribute's data within the correct buffer.
+
+If you need to know the specific index of the stream containing the attribute, use GetVertexAttributeStream. To get the total size (stride) of a single vertex within the attribute's stream, use GetVertexBufferStride, passing the stream index obtained from `GetVertexAttributeStream`.
+
+Additional resources: GetVertexAttributeStream, vertexBufferCount, GetVertexBufferStride, Mesh.GetVertexAttributeOffset.

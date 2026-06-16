@@ -1,0 +1,20 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/GUISkin-horizontalScrollbarLeftButton.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Style used by default for the left button on GUI.HorizontalScrollbar controls.
+
+```csharp
+using UnityEngine;public class Example : MonoBehaviour
+{
+    // Modifies only the horizontal scrollbar
+    // left button of the current GUISkin    float hSbarValue;
+    GUIStyle style;    void OnGUI()
+    {
+        GUI.skin.horizontalScrollbarLeftButton = style;
+        hSbarValue = GUILayout.HorizontalScrollbar(hSbarValue, 1.0f, 0.0f, 10.0f);
+    }
+}
+```

@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/UIElements.DragLeaveEvent-ctor.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Constructor. Avoid renewing events. Instead, use GetPooled() to get an event from a pool of reusable events.

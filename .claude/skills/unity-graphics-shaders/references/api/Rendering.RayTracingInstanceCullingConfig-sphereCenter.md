@@ -1,0 +1,11 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Rendering.RayTracingInstanceCullingConfig-sphereCenter.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+The center of the sphere used for culling ray tracing instances associated with the Renderers in a Scene.
+
+To enable sphere culling, use RayTracingInstanceCullingFlags.EnableSphereCulling flag in RayTracingInstanceCullingConfig.flags.
+
+Additional resources: RayTracingAccelerationStructure.CullInstances.

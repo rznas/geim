@@ -1,0 +1,11 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/android-optimize-application-startup.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Optimize application startup times
+
+Android devices can optimize the startup process for an application to reduce the time it takes the application to become interactive. For Android to do this, the application must indicate when it finishes initialization and becomes interactive for end users. Android then prioritizes work that must complete before the application is initialized.
+
+Android applications use the [Activity.reportFullyDrawn](https://developer.android.com/reference/android/app/Activity#reportFullyDrawn()) API to indicate that they have finished start-up. By default, Unity calls this method as the first **scene** loads, before Awake. However, if your application must do some extra work before users can interact with it, for example if the application needs to load some resources before it can show anything on the screen, you should call this API yourself on the frame that your application becomes interactive. To do this, call DiagnosticsReporting.CallReportFullyDrawn. If you call this method somewhere in your code, Unity no longer calls the method automatically when the first scene loads.
+
+**Note**: Android only counts the first time you call `CallReportFullyDrawn`, so there is no reason to call it multiple times.

@@ -1,0 +1,97 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/ImporterConsistency.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Check the consistency of the import process
+
+Asset importers, including any scripted importers that you write, must produce consistent, or [deterministic](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/code-generation#deterministic) results. A deterministic importer always produces the same output from the same input and set of dependencies, and always registers the same set of dependencies for a given environment.
+
+The Asset Database has the following ways that you can check the consistency and determinism of the import results of the assets in your project:
+
+- Manually reimport one or more assets in the Unity Editor.
+- Use the `-consistencyCheck` command-line argument to open the Editor.
+
+## Manually reimport assets
+
+Manually reimporting an asset causes Unity to check whether a new import result matches the previous cached import results.
+
+To start a manual reimport, select an asset and perform one of the following actions:
+
+- Right-click on the asset and select **Reimport** from the context menu.
+- Go to **Assets** > **Reimport**.
+
+Unity then checks the resulting import for consistency. If it detects inconsistent results, Unity prints a warning in the Console window with details about which importer caused the issue, such as:
+
+`Importer(<name of importer>) generated inconsistent result for asset(guid:<guid of the asset>) "<name of asset>"`
+
+When you reimport a root asset, Unity also reimports and performs the consistency check on its child assets.
+
+## Run consistency checks with the command-line
+
+To perform a check on all assets and importers in your project, open the Unity Editor with the `-consistencyCheck` command line argument. Unity then logs any inconsistencies found during startup to the console, and the Editor log file.
+
+The `-consistencyCheck` argument has the following modes:
+
+- `-consistencyCheckSourceMode local`: Checks against the local result on disk in the `Library` folder.
+- `-consistencyCheckSourceMode cacheserver`: Checks against a Unity Accelerator cache server.
+
+If you don’t pass the `-consistencyCheckSourceMode` argument, Unity performs a local check.
+
+If you use `-consistencyCheckSourceMode cacheserver`, the consistency checker only checks asset imports that can be cached. For example, if you disable caching for a `ScriptedImporter` instance, then the consistency check for that import is also disabled. For more information, refer to `AssetImporters.ScriptedImporterAttribute` for details on how to disable caching for a scripted importer.
+
+**Important:** If you use the `cacheserver` argument and Unity **Accelerator** isn’t available, or hasn’t been set up, then the consistency checker prints out warnings in the Editor log that the cache server is unavailable. Additionally, if you use Unity Accelerator as the source, Unity disables uploads to the cache server to prevent uploading the result you’re about to check.
+
+## Editor log output
+
+When Unity detects importer inconsistencies, you can find more information about the issue in the Editor log. This includes information such as:
+
+- Which asset caused the failed consistency check and its GUID.
+- The content hash for the asset import result.
+- A comparison of the previous revision of the asset.
+
+To open the log:
+
+1. Open the **Console** window (**Window** > **General** > **Console**).
+2. Select the More menu (⋮) and select **Open Editor Log**.
+
+The Editor log displays inconsistencies in the following format:
+
+```
+ConsistencyChecker - guid: <asset_guid>, dependenciesHash.value: <dep_hash_a>, importResultID: <result_id_a>, producedFiles[0].extension: , producedFiles[0].contentHash: <content_hash_a>
+
+ConsistencyChecker - guid: <asset_guid>, dependenciesHash.value: <dep_hash_a>, importResultID: <result_id_b>, producedFiles[0].extension: , producedFiles[0].contentHash: <content_hash_b>
+
+ConsistencyChecker - guid: <asset_guid>, dependenciesHash.value: <dep_hash_a>, importResultID: <result_id_b>, producedFiles[0].extension: , producedFiles[0].contentHash: <content_hash_b>
+
+Importer(<importer_name>) generated inconsistent result for asset(<asset_guid>) <asset_path>
+```
+
+### Inconsistent result log example
+
+In the following example, two cached results share the same `dependenciesHash` value but have different `importResultID` values and different content hashes. This means the importer produced different output from the same input:
+
+```
+ConsistencyChecker - guid: a1945cd7aab67441ba89015f97494624, dependenciesHash.value: fb8cfb407bba82d4daded6031688ba9b, importResultID: 07078a054d3f597b4c2cc47e8e4c0bde, producedFiles[0].extension: , producedFiles[0].contentHash: 8490a5ed35a4361d679e6055a386969e
+
+ConsistencyChecker - guid: a1945cd7aab67441ba89015f97494624, dependenciesHash.value: fb8cfb407bba82d4daded6031688ba9b, importResultID: 07078a054d3f597b4c2cc47e8e4c0bde, producedFiles[1].extension: .info, producedFiles[1].contentHash: 4bd9140e19d2e44782f1131172e514ba
+
+ConsistencyChecker - guid: a1945cd7aab67441ba89015f97494624, dependenciesHash.value: fb8cfb407bba82d4daded6031688ba9b, importResultID: 646d6432767729ea7d288c636183de97, producedFiles[0].extension: , producedFiles[0].contentHash: 5ca760170f85012ce16aa8c22e8d9ea1
+
+ConsistencyChecker - guid: a1945cd7aab67441ba89015f97494624, dependenciesHash.value: fb8cfb407bba82d4daded6031688ba9b, importResultID: 646d6432767729ea7d288c636183de97, producedFiles[1].extension: .info, producedFiles[1].contentHash: 4bd9140e19d2e44782f1131172e514ba
+
+Importer(ScriptedImporter:Assembly-CSharp::RandomImporter) generated inconsistent result for asset(guid:a1945cd7aab67441ba89015f97494624) "Assets/first.rand"
+```
+
+## Convert produced files
+
+A `producedFile` is in a binary format. You can use the `binary2text` tool to examine the contents of the `Library` folder to find out exactly what the importer generated. The `binary2text` tool is located in the `Data/Tools` folder in your Unity Editor installation. On macOS, this tool is located at `Unity.app/Contents/Helpers/`.
+
+You can then open the converted inconsistent results in a diff tool to analyze which part of the import operation was non-deterministic.
+
+For more information on the `binary2text` tool, refer to Analyze built assets.
+
+## Additional resources
+
+- Introduction to Unity Accelerator
+- Log files reference
+- Command line arguments

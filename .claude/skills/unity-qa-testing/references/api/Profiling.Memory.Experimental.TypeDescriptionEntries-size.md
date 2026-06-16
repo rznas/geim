@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Profiling.Memory.Experimental.TypeDescriptionEntries-size.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Size in bytes of an instance of this type. If this type is an array type, this describes the amount of bytes a single element in the array will take up.

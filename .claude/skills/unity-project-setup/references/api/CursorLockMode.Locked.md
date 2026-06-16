@@ -1,0 +1,34 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/CursorLockMode.Locked.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Locks the cursor to the center of the Game view.
+
+`CursorLockMode.Locked` also hides the hardware cursor. However, the cursor is only locked and hidden after you click in the Game view.
+
+**Android**: Only supported on Android 8.0 (API 26) or newer.
+
+```csharp
+//This script makes Buttons that control the Cursor's lock state. Note that the Confined mode only works on Windows and Linux Standalone platform build.using UnityEngine;public class Example : MonoBehaviour
+{
+    void Update()
+    {
+        //Press the space bar to apply no locking to the Cursor
+        if (Input.GetKey(KeyCode.Space))
+            Cursor.lockState = CursorLockMode.None;
+    }    void OnGUI()
+    {
+        //Press this button to lock the Cursor
+        if (GUI.Button(new Rect(0, 0, 100, 50), "Lock Cursor"))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }        //Press this button to confine the Cursor within the screen
+        if (GUI.Button(new Rect(125, 0, 100, 50), "Confine Cursor"))
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }
+    }
+}
+```

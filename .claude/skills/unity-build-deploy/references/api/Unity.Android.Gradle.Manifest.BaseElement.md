@@ -1,0 +1,28 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Unity.Android.Gradle.Manifest.BaseElement.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Abstract base class for all existing Android manifest elements.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| CustomElements | Custom child elements. |
+
+### Public Methods
+
+| Method | Description |
+| --- | --- |
+| AddCustomElement | Adds a new element as a child. |
+| GetAllAttributes | Gets all attributes on this element. |
+| GetCustomAttribute | Gets a custom attribute by attribute name. |
+| GetID | Gets the unique ID of the element. |
+| GetName | Gets the element name. |
+| GetUniqueName | Gets a unique name of the element. |
+| Remove | Removes this element from the file. |
+| RemoveCustomAttribute | Removes a custom attribute by name. |
+| ResolveConflict | Resolve a conflict if element was already modified by another script. |
+| SetCustomAttribute | Sets a custom attribute with name and value. |

@@ -1,0 +1,16 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Animations.ParentConstraint.SetRotationOffset.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| index | The index of the constraint source. |
+| value | The new rotation offset. |
+
+### Description
+
+Sets the rotation offset associated with a source by index.
+
+Throws InvalidOperationException, if the list of sources is empty. Throws ArgumentOutOfRangeException, if the index is invalid.

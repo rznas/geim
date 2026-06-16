@@ -1,0 +1,56 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/UnityEngine.XRModule.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+The XR module contains the VR and AR related platform support functionality.
+
+### Classes
+
+| Class | Description |
+| --- | --- |
+| CommonUsages | Defines static variables that are used to retrieve input features from XR.InputDevice.TryGetFeatureValue. |
+| InputDevices | An interface for accessing devices in the XR input subsytem. |
+| InputTracking | A collection of methods and properties for accessing XR input devices by their XR Node representation. |
+| XRDisplaySubsystem | An XRDisplaySubsystem controls rendering to a head tracked display. |
+| XRDisplaySubsystemDescriptor | Class providing information about XRDisplaySubsystem registration. |
+| XRInputSubsystem | XRInputSubsystem Instance is used to enable and disable the inputs coming from a specific plugin. |
+| XRInputSubsystemDescriptor | Information about an Input subsystem. |
+| XRMeshSubsystem | Allows external systems to provide dynamic meshes to Unity. |
+| XRMeshSubsystemDescriptor | Information about an XRMeshSubsystem. |
+| XRStats | Provides timing and other statistics from XR subsystems. |
+
+### Structs
+
+| Struct | Description |
+| --- | --- |
+| Bone | A tracked bone on the device at an XRNode in the XR input subsystem. |
+| Eyes | Contains eye tracking data from the device at an XRNode in the XR input subsystem. |
+| Hand | A tracked hand on the device at an XRNode in the XR input subsystem. |
+| HapticCapabilities | Describes the haptic capabilities of the device at an XRNode in the XR input subsystem. |
+| InputDevice | Defines an input device in the XR input subsystem. |
+| InputFeatureUsage | Defines a generic usage that maps to an input feature on a device. Use the As method to turn into a generic usage. |
+| InputFeatureUsage<T0> | Defines a generic usage that maps to an input feature on a device. |
+| MeshGenerationResult | Contains event information related to a generated mesh. |
+| MeshId | A session-unique identifier for trackables in the environment, e.g., planes and feature points. |
+| MeshInfo | Contains state information related to a tracked mesh. |
+| MeshTransform | Contains transform information related to a tracked mesh. |
+| XRMirrorViewBlitMode | Engine reserved blit modes. Blit mode capabilities should be queried from XRDisplaySubsystemDescriptor.GetAvailableMirrorBlitModeCount and XRDisplaySubsystemDescriptor.GetMirrorBlitModeByIndex. |
+| XRMirrorViewBlitModeDesc | Struct that describes the mirror view blit mode. |
+| XRNodeState | Describes the state of a node tracked by an XR system. |
+
+### Enumerations
+
+| Enumeration | Description |
+| --- | --- |
+| HandFinger | Enumeration describing the AR rendering mode used with Hand. |
+| InputDeviceCharacteristics | A set of bit flags describing InputDevice characteristics. |
+| InputDeviceRole | Enumeration describing the role of a InputDevice in providing input. |
+| InputTrackingState | Represents the values being tracked for this device. |
+| MeshChangeState | The state of a tracked mesh since the last query. |
+| MeshGenerationOptions | Options for generating meshes. |
+| MeshGenerationStatus | The status of a XRMeshSubsystem.GenerateMeshAsync. |
+| MeshVertexAttributes | A set of vertex attributes. |
+| TrackingOriginModeFlags | This enum provides context to where the 0,0,0 point of tracking for InputDevices is. |
+| XRNode | Enumeration of XR nodes which can be updated by XR input or sent haptic data. |

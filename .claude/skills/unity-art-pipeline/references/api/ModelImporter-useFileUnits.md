@@ -1,0 +1,11 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/ModelImporter-useFileUnits.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Detect file units and import as 1FileUnit=1UnityUnit, otherwise it will import as 1cm=1UnityUnit.
+
+This setting is used only for .max files. It was introduced for backwards compatibility: there is a bug in some FBX 2011 plugins - they fail to pick up file units and export everything as 1unit=1cm. We fixed that problem by setting the units manually, but that breaks projects which were built with FBX 2011 plugins already, so useFileUnits was introduced as a solution. Set it to false if you want to default to centimeters in FBX exporter.
+
+Additional resources: isUseFileUnitsSupported.

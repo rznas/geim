@@ -1,0 +1,11 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Unity.Hierarchy.HierarchyViewNodesEnumerable.Enumerator.MoveNext.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Returns
+
+**bool** `true` if Current item is valid, `false` otherwise.
+
+### Description
+
+Move to next iterable value.

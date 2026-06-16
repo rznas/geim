@@ -1,0 +1,122 @@
+// BuildScript.cs — editor build script for command-line / CI builds.
+//
+// PLACE THIS IN AN `Editor/` FOLDER: Assets/Editor/BuildScript.cs
+// (anything that references the UnityEditor namespace must live in an Editor
+// assembly, or the PLAYER build won't compile.)
+//
+// Invoke from the command line (no Editor GUI):
+//   unity.sh -batchmode -nographics -quit \
+//            -projectPath /abs/path/to/Project \
+//            -executeMethod BuildScript.Build \
+//            -buildTarget StandaloneLinux64 \
+//            -logFile /abs/path/to/build.log
+//
+// THE GOTCHA: there is no pure-CLI "build whatever's open" flag. You write THIS
+// static method, point -executeMethod at it, and list the scenes EXPLICITLY
+// (here, from EditorBuildSettings.scenes — see EditorBuildSettings-scenes.md).
+// `-buildTarget` on the command line selects the platform; do NOT rely on
+// setting BuildPlayerOptions.target in batch mode to *switch* platforms — per
+// build-command-line.md that does not work as expected, because switching the
+// target needs a domain reload that can't happen mid-script. Pass -buildTarget.
+//
+// Doc-sourced from references/api/BuildPipeline.BuildPlayer.md,
+// BuildPlayerOptions.md, EditorBuildSettings-scenes.md,
+// EditorBuildSettingsScene.md, Build.Reporting.BuildReport.md,
+// Build.Reporting.BuildSummary-result.md (Unity 6 / 6000.x).
+// NOT compile-tested in this environment (no Editor installed).
+
+using System;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using UnityEditor.Build.Reporting;
+
+public static class BuildScript
+{
+    // The entry point named on the command line: -executeMethod BuildScript.Build
+    // MUST be public + static + take no parameters — -executeMethod cannot pass
+    // arguments to the method. Read extra values from Environment.GetCommandLineArgs().
+    public static void Build()
+    {
+        BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
+
+        // 1. SCENES — the explicit list, taken from the enabled entries in the
+        //    Build Profiles / Build Settings scene list. If this array is empty,
+        //    BuildPlayer falls back to "the currently open Scene" — which in
+        //    batch mode is effectively an empty build (see BuildPlayerOptions-scenes.md).
+        buildPlayerOptions.scenes = EditorBuildSettings.scenes
+            .Where(scene => scene.enabled)
+            .Select(scene => scene.path)
+            .ToArray();
+
+        if (buildPlayerOptions.scenes.Length == 0)
+            throw new Exception(
+                "No enabled scenes in EditorBuildSettings.scenes — the build " +
+                "would be empty. Add scenes in File > Build Profiles (Scene List).");
+
+        // 2. TARGET — reflects the platform Unity STARTED with, which the
+        //    -buildTarget CLI arg set. We read it rather than switch it, because
+        //    switching the target inside a batch-mode script doesn't take effect
+        //    (build-command-line.md). EditorUserBuildSettings-activeBuildTarget.md.
+        buildPlayerOptions.target = EditorUserBuildSettings.activeBuildTarget;
+
+        // 3. OUTPUT PATH — pass "-out <path>" on the CLI, else use a default.
+        //    Platform extensions matter; see references/player_settings_and_platforms.md.
+        buildPlayerOptions.locationPathName =
+            GetArg("-out") ?? DefaultOutputPath(buildPlayerOptions.target);
+
+        buildPlayerOptions.options = BuildOptions.None;
+
+        // 4. BUILD and inspect the BuildReport (BuildPipeline.BuildPlayer.md).
+        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+        BuildSummary summary = report.summary;
+
+        Debug.Log("Build result : " + summary.result);
+        Debug.Log("Output       : " + summary.outputPath);
+        Debug.Log("Size         : " + summary.totalSize + " bytes");
+        Debug.Log("Time         : " + summary.totalTime);
+        Debug.Log("Errors       : " + summary.totalErrors +
+                  "  Warnings: " + summary.totalWarnings);
+
+        if (summary.result == BuildResult.Succeeded)
+        {
+            Debug.Log("Build succeeded: " + summary.totalSize + " bytes");
+        }
+        else
+        {
+            // Throwing in batch mode makes Unity exit with a NON-ZERO code, so
+            // build.sh / CI sees the failure. (Combined with -quit on the CLI.)
+            throw new Exception("Build FAILED: " + report.SummarizeErrors());
+        }
+    }
+
+    // --- helpers ---------------------------------------------------------
+
+    // Read a "-flag value" pair from the process command line.
+    private static string GetArg(string name)
+    {
+        string[] args = Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == name)
+                return args[i + 1];
+        return null;
+    }
+
+    private static string DefaultOutputPath(BuildTarget target)
+    {
+        // Platform extensions matter — see references/player_settings_and_platforms.md.
+        switch (target)
+        {
+            case BuildTarget.StandaloneWindows64:
+            case BuildTarget.StandaloneWindows:
+                return "Builds/Windows/Game.exe";
+            case BuildTarget.StandaloneOSX:
+                return "Builds/macOS/Game.app";
+            case BuildTarget.Android:
+                return "Builds/Android/Game.apk";
+            case BuildTarget.StandaloneLinux64:
+            default:
+                return "Builds/Linux/Game.x86_64";
+        }
+    }
+}

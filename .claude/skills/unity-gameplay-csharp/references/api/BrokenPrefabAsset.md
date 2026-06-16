@@ -1,0 +1,55 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/BrokenPrefabAsset.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+BrokenPrefabAsset is for Prefab files where the file content cannot be loaded without errors.
+
+A Prefab Asset can be broken if the content of the file invalid or if it is a Variant Prefab where the parent Prefab is either invalid or missing.
+
+Search for t:BrokenPrefabAsset in the project browser to see which assets are of that type.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| brokenPrefabParent | The broken parent Prefab file if it has not been deleted. |
+| isPrefabFileValid | Returns true if the content of the file is valid. |
+| isVariant | Returns true if the prefab is a variant. |
+
+### Inherited Members
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| hideFlags | Should the object be hidden, saved with the Scene or modifiable by the user? |
+| name | The name of the object. |
+
+### Public Methods
+
+| Method | Description |
+| --- | --- |
+| GetEntityId | Gets the EntityId of the object. |
+| ToString | Returns the name of the object. |
+
+### Static Methods
+
+| Method | Description |
+| --- | --- |
+| Destroy | Removes a GameObject, component, or asset. |
+| DestroyImmediate | Destroys the specified object immediately. Use with caution and in Edit mode only. |
+| DontDestroyOnLoad | Do not destroy the target Object when loading a new Scene. |
+| FindAnyObjectByType | Retrieves any active loaded object of Type type. |
+| FindObjectsByType | Retrieves a list of all loaded objects of Type type. |
+| Instantiate | Clones the object original and returns the clone. |
+| InstantiateAsync | Captures a snapshot of the original object (that must be related to some GameObject) and returns the AsyncInstantiateOperation. |
+
+### Operators
+
+| Operator | Description |
+| --- | --- |
+| bool | Does the object exist? |
+| operator != | Compares if two objects refer to a different object. |
+| operator == | Compares two object references to see if they refer to the same object. |

@@ -1,0 +1,43 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/frame-timing-manager-record-timing-data.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Read frame timing data with ProfilerRecorder
+
+You can use the `ProfilerRecorder` API to get custom and built-in **Profiler counter** values, and to read `FrameTimingManager` values.
+
+The benefit of this is that when you use the `ProfilerRecorder` API, `FrameTimingManager` only records values when you attach a recorder to a specific counter. This behavior enables you to control which counters collect data and reduces the impact that the `FrameTimingManager` has on performance.
+
+The following example tracks only the CPU Main Thread Frame Time variable with the `ProfilerRecorder` API:
+
+```csharp
+using Unity.Profiling;
+using UnityEngine;
+
+public class ExampleScript : MonoBehaviour
+{
+    ProfilerRecorder mainThreadTimeRecorder;
+
+    void OnEnable()
+    {
+        mainThreadTimeRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Internal, "CPU Main Thread Frame Time");
+    }
+
+    void OnDisable()
+    {
+        mainThreadTimeRecorder.Dispose();
+    }
+
+    void Update()
+    {
+        var frameTime = mainThreadTimeRecorder.LastValue;
+
+        // Your code logic here
+    }
+}
+```
+
+## Additional resources
+
+- Get frame timing data
+- Adding profiling information to your code

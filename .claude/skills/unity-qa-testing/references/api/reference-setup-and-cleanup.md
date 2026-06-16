@@ -1,0 +1,85 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/test-framework/reference-setup-and-cleanup.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Setting up and cleaning up at build time
+
+Sometimes you might want to make changes to Unity or the file system before building tests and then clean up these changes after the test run. You can incorporate pre-build setup and post-build cleanup stages in your tests in one of the following ways:
+
+- Implement `IPrebuildSetup` and `IPostBuildCleanup` interfaces in a test class.
+- Apply the `[PrebuildSetup]` and `[PostBuildCleanup]` attributes to your test class, to an individual test, or to the test assembly, and provide a class that implements the corresponding interface as an argument. For example, decorate a test method with `[PrebuildSetup("MyTestSceneSetup")]` to perform prebuild setup work defined in a class called `MyTestSceneSetup` that implements `IPrebuildSetup`.
+
+Both `PrebuildSetup` and `PostBuildCleanup` attributes run if the test or test class they’re applied to is included in the current test run. The test is included when you run all tests or if you define a filter that includes it. If multiple tests reference the same pre-build setup or post-build cleanup, then it only runs once.
+
+The following example implements `IPrebuildSetup` on a test class to define work to perform prior to building tests:
+
+```
+[TestFixture]
+public class CreateSpriteTest : IPrebuildSetup
+{
+    Texture2D m_Texture;
+    Sprite m_Sprite;
+    
+    public void Setup()
+    {
+
+#if UNITY_EDITOR
+
+        var spritePath = "Assets/Resources/Circle.png";
+
+        var ti = UnityEditor.AssetImporter.GetAtPath(spritePath) as UnityEditor.TextureImporter;
+
+        ti.textureCompression = UnityEditor.TextureImporterCompression.Uncompressed;
+
+        ti.SaveAndReimport();
+
+#endif
+    }
+
+    [SetUp]
+    public void SetUpTest()
+    {
+        m_Texture = Resources.Load<Texture2D>("Circle");
+    }
+
+    [Test]
+    public void WhenNullTextureIsPassed_CreateShouldReturnNullSprite()
+    {
+
+        // Check with Valid Texture.
+
+        LogAssert.Expect(LogType.Log, "Circle Sprite Created");
+
+        Sprite.Create(m_Texture, new Rect(0, 0, m_Texture.width, m_Texture.height), new Vector2(0.5f, 0.5f));
+
+        Debug.Log("Circle Sprite Created");
+
+        // Check with NULL Texture. Should return NULL Sprite.
+
+        m_Sprite = Sprite.Create(null, new Rect(0, 0, m_Texture.width, m_Texture.height), new Vector2(0.5f, 0.5f));
+
+        Assert.That(m_Sprite, Is.Null, "Sprite created with null texture should be null");
+
+    }
+}
+```
+
+**Note**: Use `#if UNITY_EDITOR` if you want to access Editor only APIs, but the setup/cleanup is inside a **Play Mode** assembly.
+
+## Setup and Cleanup with Test Data
+
+You can use the `IPrebuildSetupWithTestData` and the `IPostBuildCleanupWithTestData` interfaces to define setup and cleanup methods that have access to `Test Data`. The test data contains information about the tests that are about to or have just run.
+
+The respective attributes also exist and the same rules and patterns apply as specified above.
+
+## Execution order
+
+All setups run in a deterministic order one after another. Setups defined with attributes run first. Then any test class implementing the interface runs, in alphabetical order within their namespace, which is the same order as the tests run.
+
+Setups that provide the TestData object will run in the above order before all the Setups that do not provide data. The same applies to the Cleanups.
+
+In a Player build, cleanup runs immediately after the test. In the Unity Editor cleanup runs only after related tests complete.
+
+## Additional resources
+
+- Setup and cleanup at build time

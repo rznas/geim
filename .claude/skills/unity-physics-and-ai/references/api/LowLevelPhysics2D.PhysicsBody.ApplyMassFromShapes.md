@@ -1,0 +1,7 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/LowLevelPhysics2D.PhysicsBody.ApplyMassFromShapes.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Typically a body will automatically calculate the MassConfiguration using all the attached shapes. The MassConfiguration is automatically updated whenever a PhysicsShape is added, removed or modified. When adding many shapes to a body, you can choose to stop this automatic calculation, therefore improving performance, by disabling PhysicsShapeDefinition.startMassUpdate for each shape being added to the body. This call will result in the MassConfiguration being calculated using the currently added PhysicsShape so is typically called after many shapes are added if they have PhysicsShapeDefinition.startMassUpdate disabled. Alternately, if you wish to assign your own MassConfiguration then disabling the automatic calculation also makes sense. In either case, you must call this method or set PhysicsBody.massConfiguration before any simulation step occurs otherwise the PhysicsBody will exhibit unstable collision behaviour. The MassConfiguration will be overwritten when calling PhysicsBody.ApplyMassFromShapes, if PhysicsBody.massConfiguration is set or when adding, removing or changing PhysicsShape with PhysicsShapeDefinition.startMassUpdate enabled.

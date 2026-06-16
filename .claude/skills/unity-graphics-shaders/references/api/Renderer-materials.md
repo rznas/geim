@@ -1,0 +1,16 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Renderer-materials.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Returns all the instantiated materials of this object.
+
+This is an array of all materials used by the renderer. Unity supports a single object using multiple materials; in this case `materials` contains all the materials. sharedMaterial and material properties return the first used material if there is more than one.
+
+Modifying any material in `materials` will change the appearance of only that object.
+
+Note that like all arrays returned by Unity, this returns a copy of materials array. If you want to change some materials in it, get the value, change an entry and set materials back.
+
+**Note:**
+ This function automatically instantiates the materials and makes them unique to this renderer. It is your responsibility to destroy the materials when the game object is being destroyed. Resources.UnloadUnusedAssets also destroys the materials but it is usually only called when loading a new level.

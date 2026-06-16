@@ -1,0 +1,17 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Renderer-sharedMaterials.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+All the shared materials of this object.
+
+This is an array of all materials used by the renderer. Unity supports multiple objects using a single material; in this case `sharedMaterials` contains all the materials used for this. sharedMaterial and material properties return the first used material if there is more than one.
+
+Modifying any material in `sharedMaterials` will change the appearance of all objects using this material, and change material settings that are stored in the project too.
+
+It is not recommended to modify materials returned by sharedMaterials. If you want to modify the material of a renderer use material instead.
+
+Note that like all arrays returned by Unity, this returns a copy of materials array. If you want to change some materials in it, get the value, change an entry and set materials back.
+
+Additional resources: material, sharedMaterial properties.

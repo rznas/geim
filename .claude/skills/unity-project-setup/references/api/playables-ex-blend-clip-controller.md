@@ -1,0 +1,39 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/Manual/playables-ex-blend-clip-controller.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+# Blend an animation clip with a controller
+
+This example demonstrates how to use an `AnimationMixerPlayable` to blend an `AnimationClip` with an `AnimatorController`. To do this, you must first wrap each asset in its corresponding playable:
+
+- Wrap the `AnimationClip` (`clip`) in an `AnimationClipPlayable` (`clipPlayable`).
+- Wrap the `RuntimeAnimatorController` (`controller`) in an `AnimatorControllerPlayable` (`controllerPlayable`).
+
+The `SetInputWeight()` method dynamically adjusts the blend weight of each playable.
+
+## Prerequisites
+
+To use the `BlendClipWithController` script in your project, your project must have the following:
+
+- A **GameObject**, such as a cube or a capsule. You don’t need to manually add an **Animator component** to this GameObject. The `RequireComponent` attribute adds this component if it’s not present.
+- An **animation clip** that animates the properties of the GameObject. For example, an animation that changes the position and rotation of a GameObject.
+- An Animator Controller with at least one state that uses a different animation clip from the one that animates the GameObject. If you use the same animation clip, there’s no difference when the PlayableGraph blends between the clip and controller.
+
+## Add and run the script
+
+To use the `BlendClipWithController` script in your project, follow these steps:
+
+1. Add a script component to your GameObject. Name the script file `BlendClipWithController.cs` and use the following code: `using UnityEngine; using UnityEngine.Playables; using UnityEngine.Animations; [RequireComponent(typeof(Animator))] public class BlendClipWithController : MonoBehaviour { public AnimationClip clip; public RuntimeAnimatorController controller; public float weight; PlayableGraph graph; AnimationMixerPlayable mixer; void Start() { // Create the graph, the mixer, and bind them to the Animator. graph = PlayableGraph.Create("BlendClipWithController"); mixer = AnimationMixerPlayable.Create(graph, 2); var output = AnimationPlayableOutput.Create(graph, "Animation", GetComponent<Animator>()); output.SetSourcePlayable(mixer); // Create playables and connect them to the mixer. var clipPlayable = AnimationClipPlayable.Create(graph, clip); var controllerPlayable = AnimatorControllerPlayable.Create(graph, controller); graph.Connect(clipPlayable, 0, mixer, 0); graph.Connect(controllerPlayable, 0, mixer, 1); // Play the Graph. graph.Play(); } void Update() { // Clamp the weight between 0 and 1. weight = Mathf.Clamp01(weight); // Adjust the weight of each mixer input. mixer.SetInputWeight(0, 1.0f-weight); mixer.SetInputWeight(1, weight); } void OnDisable() { // Destroy all Playables and Outputs created by the graph. graph.Destroy(); } }`
+2. In the Script component, select the animation clip for input node 0 and the Animator Controller for input node 1.
+3. Specify a weight for the Animator Controller in relation to the animation clip.
+ The script adjusts the weight of input node 0 in relation to input node 1 so that the combined weights equal 1.0. For example, a weight of 0.4 sets the Animator Controller to 40% weight and the animation clip to 60% weight.
+4. Select **Play** to switch the Editor to Play mode.
+5. In the Script component, experiment with different weights.
+6. If you have installed the PlayableGraph Visualizer package, select `BlendClipWithController` to display the PlayableGraph.
+
+## Additional resources
+
+- Animator Controller
+- The SetInputWeight method
+- Creating scripts
+- Play mode in the Game view

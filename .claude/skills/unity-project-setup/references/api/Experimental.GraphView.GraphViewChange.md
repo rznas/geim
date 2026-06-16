@@ -1,0 +1,16 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Experimental.GraphView.GraphViewChange.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Set of changes in the graph that can be intercepted.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| edgesToCreate | Edges about to be created. |
+| elementsToRemove | Elements about to be removed. |
+| movedElements | Elements already moved. |
+| moveDelta | The delta of the last move. |

@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/BuildTarget.PS5.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Build to PlayStation 5 platform.
+
+Additional resources: BuildPipeline.BuildPlayer.

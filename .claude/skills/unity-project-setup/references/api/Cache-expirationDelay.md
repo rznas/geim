@@ -1,0 +1,9 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Cache-expirationDelay.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+The number of seconds that an AssetBundle may remain unused in the cache before it is automatically deleted.
+
+This value defaults to 150 days (12,960,000 seconds). Lower values will cause the cache to be cleaned more aggressively in order to minimize disk storage usage. The delay cannot be set greater than 12,960,000 seconds.

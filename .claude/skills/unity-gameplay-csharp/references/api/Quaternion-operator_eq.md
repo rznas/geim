@@ -1,0 +1,11 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/Quaternion-operator_eq.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Description
+
+Are two quaternions equal to each other?
+
+This function tests whether dot product of two quaternions is close to 1.0.
+
+Note that because quaternions can represent rotations that are up to two full revolutions (720 degrees), this comparison can return `false` even if resulting rotations look the same.

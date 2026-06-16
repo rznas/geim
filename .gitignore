@@ -1,0 +1,5 @@
+# Local Unity 6 documentation source tree (~1.1 GB, 39k HTML files).
+# Used to GENERATE the converted Markdown embedded in .claude/skills/unity-*/references/api/.
+# The source HTML itself is not committed — download the Unity 6 offline docs to
+# docs/UnityDocumentation/ to regenerate (see .claude/skills/_tools/unity_html_to_md.py).
+docs/UnityDocumentation/

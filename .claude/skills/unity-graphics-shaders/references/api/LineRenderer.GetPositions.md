@@ -1,0 +1,21 @@
+<!-- source: /home/reza/projects/game/docs/UnityDocumentation/Documentation/en/ScriptReference/LineRenderer.GetPositions.html
+     Unity 6 (6000.x) — converted by unity_html_to_md.py.
+     Doc-sourced; not compile-tested in this environment. -->
+
+### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| positions | The array of positions to retrieve. The array passed should be of at least positionCount in size. |
+
+### Returns
+
+**int** How many positions were actually stored in the output array.
+
+### Description
+
+Get the positions of all vertices in the line.
+
+This method is preferred to GetPosition when retrieving all positions, as it is more efficient to get all positions using a single command than to get each position individually.
+
+Additional resources: positionCount property, GetPosition function.
