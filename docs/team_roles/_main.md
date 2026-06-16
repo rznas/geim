@@ -9,32 +9,32 @@
 ### Programming/Engineering
 
 - **Gameplay Programmer** - Player controls, mechanics, game rules
-  - [ ] Not covered (implementation role)
+  - [x] Skills: `unity-gameplay-csharp` + `unity-physics-and-ai` (Godot: `godot-gameplay-csharp`, `godot-physics-and-ai`)
 - **Engine Programmer** - Core systems and architecture
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-project-setup` (Godot: `godot-project-setup`)
 - **Graphics Engineer** - Rendering, shaders, visual effects
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-graphics-shaders` (Godot: `godot-graphics-shaders`)
 - **AI Programmer** - Enemy/NPC behavior
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-physics-and-ai` (Godot: `godot-physics-and-ai`)
 - **Tools Programmer** - Internal development software
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-project-setup` (CLI/batchmode/asmdef; Godot: `godot-project-setup`)
 - **Network Programmer** - Multiplayer and online features
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-multiplayer` (Godot: `godot-export-build` multiplayer section)
 
 ### Art
 
 - **Concept Artist** - Initial visual designs and direction
   - [x] Agent 5: Art & Aesthetics Director
 - **3D Modeler** - Creates game assets (characters, props, environments)
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-art-pipeline` (FBX/glTF/texture import, .meta/GUID)
 - **Animator** - Movement and character animation
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-art-pipeline` (Mecanim Animator, blend trees, C# driving)
 - **Technical Artist** - Bridges art and programming
-  - [ ] Not covered (implementation role)
+  - [x] Skills: `unity-art-pipeline` + `unity-graphics-shaders` (import pipeline + materials/shaders)
 - **VFX Artist** - Explosions, particles, special effects
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-graphics-shaders` (ParticleSystem / VFX Graph, post-fx)
 - **UI/UX Artist** - Menus and interface design
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-ui-csharp` (UI Toolkit UXML/USS, uGUI)
 - **Art Director** - Visual and audio aesthetic direction
   - [x] Agent 5: Art & Aesthetics Director
 
@@ -56,23 +56,23 @@
 ### Production
 
 - **Producer** - Manages schedules, budgets, coordinates teams
-  - [x] Agent 7: Production & Business Lead
+  - [x] Agent 7: Production & Business Lead (ship/build via `unity-build-deploy`)
 - **Project Manager** - Day-to-day task management
   - [x] Agent 7: Production & Business Lead
 
 ### Quality Assurance (QA)
 
 - **QA Tester** - Finds bugs and issues
-  - [ ] Not covered (testing role)
+  - [x] Skill: `unity-qa-testing` (Unity Test Framework, PlayMode `[UnityTest]`, headless CI)
 - **Compliance Tester** - Ensures platform requirements are met
-  - [ ] Not covered (testing role)
+  - [x] Skills: `unity-qa-testing` + `unity-build-deploy` (per-platform builds, PlayerSettings)
 
 ### Audio
 
 - **Composer** - Music and soundtracks
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-audio` (AudioMixer, dynamic music, snapshots)
 - **Sound Designer** - Sound effects
-  - [ ] Not covered (implementation role)
+  - [x] Skill: `unity-audio` (AudioSource, spatial audio, SFX randomization)
 - **Audio Director** - Audio design direction and principles
   - [x] Agent 5: Art & Aesthetics Director
 
@@ -109,6 +109,33 @@ The following 7 agents cover **design decision-making** roles:
 6. **Agent 6: Social & Community Designer** - Multiplayer Designer, Live Operations
 7. **Agent 7: Production & Business Lead** - Producer, Project Manager, Business Development
 
-**Note:** Implementation roles (Programming, Art Production, Audio Production, QA) are not covered by these design-focused agents.
+**Note:** The 7 agents cover **design decision-making**. The **implementation
+roles** (Programming, Art Production, Audio Production, QA, build/ship) are
+covered by the engine skill suites in `.claude/skills/` — see below.
+
+## Implementation Skills (Engine Suites)
+
+Implementation roles are covered by 10 per-engine agent skills. The **Unity 6
+(6000.x) C#** suite is the primary target (matches the benchmark's Unity-6 engine
+choice) and is compile-verified against Unity 6000.4.10f1; a parallel **Godot
+4.6.3-mono C#** suite (`godot-*`) exists for the same roles.
+
+| Implementation role | Unity skill |
+|---------------------|-------------|
+| Engine Programmer, Tools Programmer | `unity-project-setup` |
+| Gameplay Programmer, Systems Designer (impl) | `unity-gameplay-csharp` |
+| Gameplay Programmer, AI Programmer | `unity-physics-and-ai` |
+| Graphics Engineer, VFX Artist, Technical Artist | `unity-graphics-shaders` |
+| 3D Modeler, Animator, Technical Artist | `unity-art-pipeline` |
+| Composer, Sound Designer | `unity-audio` |
+| UI/UX Artist, Technical Designer | `unity-ui-csharp` |
+| QA Tester, Compliance Tester | `unity-qa-testing` |
+| Producer, Compliance Tester | `unity-build-deploy` |
+| Network Programmer | `unity-multiplayer` |
+
+`unity-project-setup` is the foundation every other unity-* skill assumes.
+Snippets/scaffolds are doc-grounded in the embedded Unity 6 ScriptReference and
+compile-verified against 6000.4.10f1 (exception: Netcode-for-GameObjects API in
+`unity-multiplayer` is doc-sourced only — package download is account-gated).
 
 **See:** `/the_art_of_game_design/planning/01-ROLE-BASED-SKILLS-ARCHITECTURE.md` for complete orchestration details.
