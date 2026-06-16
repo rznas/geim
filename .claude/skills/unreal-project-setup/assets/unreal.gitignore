@@ -1,0 +1,49 @@
+# .gitignore for an Unreal Engine 5.6/5.7 C++ project.
+#
+# THE RULE: everything UBT or the editor regenerates is ignored; everything that
+# IS the project — the .uproject, Source/, Config/, and Content/ — is committed.
+# Content/ holds BINARY .uasset/.umap files: they ARE your art/levels/blueprints
+# and MUST be committed (Git LFS recommended for large binaries). The dirs below
+# are pure build/cache output (per the UE Directory Structure docs) and rebuild
+# on the next Generate-Project-Files / build / editor open.
+
+# --- Regenerated / derived (NEVER commit) ---
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Build/ holds project build scaffolding. The top-level project Build/ is
+# generated; ignore it but keep platform receipts a team explicitly checks in by
+# un-ignoring as needed. Plugin Binaries/Intermediate are covered by the globs below.
+Build/
+
+# Generated IDE project files (UE treats these as pure intermediates — see
+# "Project Files for IDEs"; they are never checked in to source control).
+*.sln
+*.suo
+*.xcodeproj/
+*.xcworkspace/
+.vs/
+.vsconfig
+.idea/
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.sdf
+*.user
+
+# Per-plugin generated dirs (a project can have Plugins/<X>/{Binaries,Intermediate}).
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# --- Committed (do NOT add these to .gitignore) ---
+# *.uproject
+# Source/
+# Config/
+# Content/          <-- binary .uasset/.umap; commit them (Git LFS for big files)
+# Plugins/<X>/      <-- the plugin's Source/, Config/, Content/, .uplugin
