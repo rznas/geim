@@ -28,8 +28,8 @@ Camera) → speakers. You implement SFX/music by putting AudioSources in the
 scene, routing them to mixer groups, and driving playback + volume from C#.
 
 > Unity 6 (6000.x). Snippets are doc-sourced from the embedded Unity 6
-> ScriptReference (`references/api/`), not compile-tested in this environment
-> (no Editor installed).
+> ScriptReference (`references/api/`) and **compile-verified against Unity
+> 6000.4.10f1** — the `new_audio_manager.sh` output compiles clean headless.
 
 ## The one thing that trips everyone up
 

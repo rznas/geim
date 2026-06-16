@@ -28,9 +28,10 @@ ScriptableObjects, coroutines, and events. This is the logic spine the
 physics/UI/audio/art skills attach to — get the component model and lifecycle
 right and the rest slots in cleanly.
 
-> Unity 6 (6000.x). Every C# snippet here is **doc-sourced from the embedded
-> Unity 6 ScriptReference (`references/api/`), not compile-tested in this
-> environment (no Editor installed).** When in doubt, grep `references/api/` and
+> Unity 6 (6000.x). C# snippets are **doc-sourced from the embedded Unity 6
+> ScriptReference (`references/api/`) and compile-verified against Unity
+> 6000.4.10f1** — the `new_monobehaviour.sh` output and a PlayMode test
+> compiled + ran headless with exit 0. When in doubt, grep `references/api/` and
 > copy the real signature — Unity ≠ Godot in nearly every detail.
 
 ## The one thing that trips everyone up
@@ -182,9 +183,9 @@ import, or compile (none is installed). Then build/verify with the project-setup
 and QA skills.
 
 `scripts/unity.sh` is the shared Editor wrapper (resolves a Unity 6 binary via
-`$UNITY_PATH` / Hub locations / PATH). With no Editor installed it exits 127 with
-install instructions — so anything in these skills is doc-sourced, not
-compile-tested here.
+`$UNITY_PATH` / Hub locations / PATH). It exits 127 with install instructions if
+no Editor is found; with a Unity 6 install present the scaffolds here are
+compile-verified (6000.4.10f1).
 
 ## Depth (in `references/`)
 

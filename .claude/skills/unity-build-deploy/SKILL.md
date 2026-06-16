@@ -27,8 +27,9 @@ driven by an **editor C# build script** that calls `BuildPipeline.BuildPlayer`,
 launched headless with `-batchmode -executeMethod -buildTarget`. No GUI needed.
 
 Snippets are doc-sourced from the embedded Unity 6 ScriptReference
-(`references/api/`), **not compile-tested in this environment** (no Editor
-installed). Unity 6 / 6000.x.
+(`references/api/`) and **compile-verified against Unity 6000.4.10f1** — the
+`BuildScript.cs` template (`BuildPipeline.BuildPlayer`, `BuildPlayerOptions`)
+compiles clean in an Editor assembly headless. Unity 6 / 6000.x.
 
 ## The one thing that trips everyone up
 

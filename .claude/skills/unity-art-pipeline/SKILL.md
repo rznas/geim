@@ -185,6 +185,7 @@ name, no transition condition, no Avatar on a humanoid), pink/missing texture
 - **Verifying it actually animates headlessly →** `unity-qa-testing`.
 
 Unity 6 / 6000.x. Snippets are **doc-sourced from the embedded Unity 6
-ScriptReference (`references/api/`), not compile-tested in this environment (no
-Editor installed)** — they are Unity's own example code where possible. Run a real
-build/PlayMode test via `scripts/unity.sh` (needs an installed Editor) to verify.
+ScriptReference (`references/api/`) and compile-verified against Unity
+6000.4.10f1** — the `new_animator_driver.sh` output compiles clean headless, and
+they are Unity's own example code where possible. (Terrain code needs
+`com.unity.modules.terrain`, included in the `unity-project-setup` scaffold.)

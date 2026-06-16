@@ -25,10 +25,12 @@ Two tightly linked jobs that share the physics engine: making things move and
 collide believably, and making non-player things act. Unity 6 (6000.x).
 
 > Snippets are doc-sourced from the embedded Unity 6 ScriptReference
-> (`references/api/`), not compile-tested in this environment (no Editor
-> installed). Grep `references/api/` and copy the real signature before writing
-> any API call — Unity is not Godot (MonoBehaviour, `GetComponent<T>()`,
-> `transform`, the component model all differ).
+> (`references/api/`) and **compile-verified against Unity 6000.4.10f1** — the
+> `new_enemy_fsm.sh` FSM (with `UnityEngine.AI.NavMeshAgent`) compiles clean
+> headless. NOTE: NavMesh needs `com.unity.modules.ai` in the project manifest
+> (the `unity-project-setup` scaffold includes it). Grep `references/api/` and
+> copy the real signature before writing any API call — Unity is not Godot
+> (MonoBehaviour, `GetComponent<T>()`, `transform`, the component model differ).
 
 ## The one thing that trips everyone up
 

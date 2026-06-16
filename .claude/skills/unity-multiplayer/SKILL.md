@@ -32,9 +32,12 @@ same package:
 ## Honest coverage note (read this first)
 
 - The `UnityWebRequest` / `DownloadHandler` / `UploadHandler` snippets below are
-  **doc-sourced from the embedded Unity 6 ScriptReference** (`references/api/`),
-  not compile-tested in this environment (no Unity Editor installed). These are
-  verbatim from Unity's own examples — solid.
+  **doc-sourced from the embedded Unity 6 ScriptReference** (`references/api/`)
+  and are verbatim from Unity's own examples — solid. (Unlike the other unity-*
+  skills, NGO could not be compile-verified here: the NGO package download is
+  blocked on this account — "your account does not have the required entitlement
+  for this package" — so neither NGO nor its Linux toolchain dependency would
+  resolve. The non-NGO unity-* scaffolds ARE compile-verified vs 6000.4.10f1.)
 - **The NGO C# API is NOT in the embedded local docs.** The local
   ScriptReference's `UnityEngine.Networking.*` namespace is entirely
   `UnityWebRequest`/`DownloadHandler`/`UploadHandler` (i.e. HTTP) — there is **no

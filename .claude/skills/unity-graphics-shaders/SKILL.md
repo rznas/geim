@@ -31,9 +31,12 @@ that carry a shader + its values onto an object), **particles**, **lights**, and
 only to swap materials and push property values.
 
 > Snippets are doc-sourced from the embedded Unity 6 ScriptReference + Manual
-> (`references/api/`), **not compile-tested** in this environment (no Editor
-> installed). Before extending an API call, grep `references/api/` for the exact
-> signature.
+> (`references/api/`) and **compile-verified against Unity 6000.4.10f1**: the
+> `new_urp_shader.sh` `.shader` imports through the ShaderImporter clean, and the
+> C# material/property snippets compile headless. (The URP HLSL `Core.hlsl`
+> includes fully resolve only in a project with the URP package installed — add
+> `com.unity.render-pipelines.universal` for a real URP project.) Before
+> extending an API call, grep `references/api/` for the exact signature.
 
 ## The model in one paragraph
 

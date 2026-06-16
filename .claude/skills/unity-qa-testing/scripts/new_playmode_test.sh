@@ -64,19 +64,27 @@ namespace __ASM__
         }
 
         // PlayMode test: MUST be [UnityTest] returning IEnumerator so it can
-        // `yield return null` to let one frame (Update + physics) run before
-        // asserting. A [Test] here would assert on frame 0 and miss the change.
+        // yield to let frames run before asserting. A plain [Test] would assert
+        // on frame 0 and miss the change.
+        //
+        // GOTCHA: physics (gravity) advances in FixedUpdate, NOT on the first
+        // rendered frame — a single `yield return null` leaves a fresh Rigidbody
+        // at y=0. Yield until physics has actually stepped: WaitForFixedUpdate a
+        // few times (or WaitForSeconds). One `yield return null` is enough only
+        // for Update-driven changes, not for physics.
         [UnityTest]
-        public IEnumerator FallingBody_MovesDown_AfterOneFrame()
+        public IEnumerator FallingBody_MovesDown_UnderGravity()
         {
             var go = new GameObject("subject");
             go.AddComponent<Rigidbody>();           // gravity will pull it down
             var start = go.transform.position;
 
-            yield return null;                       // advance exactly one frame
+            // let several physics steps run so gravity integrates
+            for (int i = 0; i < 5; i++)
+                yield return new WaitForFixedUpdate();
 
             Assert.That(go.transform.position.y, Is.LessThan(start.y),
-                "Rigidbody should have fallen after one frame.");
+                "Rigidbody should have fallen after a few physics steps.");
 
             Object.Destroy(go);
         }

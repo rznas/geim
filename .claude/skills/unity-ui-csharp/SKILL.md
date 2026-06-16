@@ -164,11 +164,12 @@ locale switching, and CJK font fallback are in `references/localization.md`.
 
 ## Verifying
 
-UI C# compiles like any code. No Unity Editor is installed here, so these
-snippets are **doc-sourced from the embedded Unity 6 ScriptReference
-(`references/api/`), not compile-tested in this environment.** For "does the
-button actually fire / does the bar update", verify against a live build with the
-sibling `unity-qa-testing` skill (PlayMode tests can query the
+These snippets are **doc-sourced from the embedded Unity 6 ScriptReference
+(`references/api/`) and compile-verified against Unity 6000.4.10f1** — the
+`new_ui_toolkit_screen.sh` controller (`root.Q<Button>(...).clicked += …`)
+compiles clean headless. For "does the button actually fire / does the bar
+update", verify against a live build with the sibling `unity-qa-testing` skill
+(PlayMode tests can query the
 `rootVisualElement` and assert on `Label.text`); logic doesn't need a human, only
 looks do.
 

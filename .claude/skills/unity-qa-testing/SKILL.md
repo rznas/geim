@@ -35,10 +35,12 @@ coroutine attribute, a `LogAssert` log check, Unity-type comparers, and an
 EditMode/PlayMode split decided by your test assembly's references.
 
 > Unity 6 (6000.x). Snippets are doc-sourced from the embedded Unity 6 docs in
-> `references/api/` (Test Framework manual + ScriptReference), **not
-> compile-tested in this environment** — no Unity Editor is installed, so
-> `scripts/unity.sh` exits 127. Install Unity 6 + set `$UNITY_PATH` to actually
-> run tests.
+> `references/api/` (Test Framework manual + ScriptReference) and
+> **compile-verified + RUN against Unity 6000.4.10f1**: the
+> `new_playmode_test.sh` test asmdef + `[UnityTest]` were generated and executed
+> headless (`-runTests -batchmode -nographics -testPlatform PlayMode`), 2/2
+> passing, exit 0. `scripts/unity.sh` exits 127 if no Editor is found — set
+> `$UNITY_PATH` (or install via Hub) to run.
 
 ## The one thing that trips everyone up
 
